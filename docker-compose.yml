@@ -1,7 +1,7 @@
 version: "3.4"
 
 services:
-  graphql:
+  web:
     build:
       args:
         PHP_V: "7.4"

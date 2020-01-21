@@ -10,4 +10,10 @@ do
     sleep 1
 done
 
+echo "Migrating the database..."
+pushd /var/www/script/migration
+composer install --no-dev && ./vendor/bin/phinx migrate
+popd
+
+echo "Starting the Apache server..."
 apachectl -D FOREGROUND

@@ -2,7 +2,7 @@
 FROM debian:9 AS trackhub-base
 
 RUN apt-get update && \
-    apt-get install -y apache2 apt-transport-https netcat wget && \
+    apt-get install -y apache2 apt-transport-https netcat unzip wget && \
     rm -rf /var/lib/apt/lists/*
 
 # Configure Apache2 server
