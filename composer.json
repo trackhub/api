@@ -17,7 +17,8 @@
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
-        "overblog/graphiql-bundle": "^0.2.0"
+        "overblog/graphiql-bundle": "^0.2.0",
+        "symfony/maker-bundle": "^1.14"
     },
     "config": {
         "preferred-install": {
