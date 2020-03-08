@@ -1,0 +1,9 @@
+Track:
+  type: object
+  config:
+    resolveField: '@=resolver("App\\GraphQL\\Resolver\\My::sayHelloA", [info, args["name"]])'
+    fields:
+      name:
+        type: String
+      id:
+        type: String
