@@ -8,8 +8,8 @@ use Overblog\GraphQLBundle\Definition\Resolver\ResolverInterface;
 
 class My implements ResolverInterface
 {
-    public function sayHelloA($name) {
-        die('test qwe123');
-        throw new \Exception("Debug" . __METHOD__);
+    public function sayHelloA() {
+        return uniqid(__METHOD__);
+//        throw new \Exception("Debug" . __METHOD__);
     }
 }

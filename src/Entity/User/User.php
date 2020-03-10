@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="`user`")
  */
-class User extends BaseUser
+class User // extends BaseUser // @FIXME
 {
     /**
      * @ORM\Id
@@ -42,7 +42,7 @@ class User extends BaseUser
 
     public function __construct()
     {
-        parent::__construct();
+//        parent::__construct();
 
         $this->ratings = new ArrayCollection();
     }
