@@ -15,7 +15,8 @@
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
-        "overblog/graphiql-bundle": "^0.2.1"
+        "overblog/graphiql-bundle": "^0.2.1",
+        "symfony/var-dumper": "5.0.*"
     },
     "config": {
         "preferred-install": {

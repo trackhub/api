@@ -4,8 +4,7 @@ namespace App\GraphQL\Resolver;
 
 use App\Entity\Track;
 use App\Entity\User\User;
-use ArrayObject as ArrayObjectAlias;
-use Overblog\GraphQLBundle\Definition\ArgumentInterface as ArgumentInterfaceAlias;
+use Overblog\GraphQLBundle\Definition\ArgumentInterface;
 
 class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
 {
@@ -13,24 +12,25 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
     {
         return [
             'RootQuery' => [
-//                self::RESOLVE_FIELD => function  ($value, ArgumentInterfaceAlias $args, ArrayObjectAlias $context, ResolveInfo $info) {
-//                    return function() {
-//                        var_dump(func_get_args());
-//                    };
-//                },
-                'tracks' => function() {
-//                    var_dump(func_get_args());
-                        return [
-                            new Track(new User()),
-                        ];
+                self::RESOLVE_FIELD => function ($value, ArgumentInterface $args, \ArrayObject $context, ResolveInfo $info) {
+                    dump(func_get_args());
+                    die;
                 },
+                'tracks' => function ($TODO, ArgumentInterface $ai, \ArrayObject $resolveInfo) {
+                    return [
+                        (function () {
+                            $t = new Track(new User());
+                            $t->setNameEn('track1');
+                            return $t;
+                        })(),
+                        new Track(new User()),
+                        new Track(new User()),
+                    ];
+                },
+
+
             ],
+
         ];
     }
-
-    public function sayHelloA($name) {
-//        die('test qwe123');
-//        throw new \Exception("Debug" . __METHOD__);
-    }
-
 }

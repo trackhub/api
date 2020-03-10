@@ -1,9 +1,9 @@
 Track:
   type: object
   config:
-    resolveField: '@=resolver("App\\GraphQL\\Resolver\\My::sayHelloA", [info, args["name"]])'
+    resolveField: '@=resolver("App\\GraphQL\\Resolver\\My::sayHelloA", [value, info, args])'
     fields:
-      name:
+      nameEn:
         type: String
       id:
         type: String
