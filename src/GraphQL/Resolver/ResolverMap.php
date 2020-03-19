@@ -16,21 +16,30 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
                     dump(func_get_args());
                     die;
                 },
-                'tracks' => function ($TODO, ArgumentInterface $ai, \ArrayObject $resolveInfo) {
-                    return [
+                'tracks' => function ($root, ArgumentInterface $ai, \ArrayObject $resolveInfo) {
+                    if ($root !== null) {
+                        throw new \Exception("not implemented");
+                    }
+
+                    $limit = $ai['limit'];
+
+                    $data = [
                         (function () {
                             $t = new Track(new User());
-                            $t->setNameEn('track1');
+                            $t->setNameEn('Markovo');
+                            return $t;
+                        })(),
+                        (function () {
+                            $t = new Track(new User());
+                            $t->setNameEn('Boikovo');
                             return $t;
                         })(),
                         new Track(new User()),
-                        new Track(new User()),
                     ];
+
+                    return array_slice($data, 0, $limit);
                 },
-
-
             ],
-
         ];
     }
 }
