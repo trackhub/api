@@ -29,3 +29,9 @@ services:
     App\GraphQL\Resolver\ResolverMap:
         tags:
             - { name: overblog_graphql.resolver_map, schema: default }
+
+    App\Repository\TrackRepository:
+        class: App\Repository\TrackRepository
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Track
