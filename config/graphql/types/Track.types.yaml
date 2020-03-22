@@ -1,9 +1,18 @@
 Track:
   type: object
   config:
-    resolveField: '@=resolver("App\\GraphQL\\Resolver\\My::sayHelloA", [value, info, args])'
+#    resolveField: '@=resolver("DefaultResolver::defaultMethod", [value, info, args])'
     fields:
+      id:
+        type: String!
+      slug:
+        type: String
       nameEn:
         type: String
-      id:
-        type: String
+      visibility:
+        type: Int!
+      optimizedPoints:
+        type: "[Point]"
+# add resolver
+#      createdAt:
+#        type: Int
