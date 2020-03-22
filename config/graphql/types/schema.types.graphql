@@ -1,3 +1,4 @@
 type RootQuery {
   tracks(limit: Int!): [Track]
+  tracksMap(lat: Float): [Track]
 }

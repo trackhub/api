@@ -31,6 +31,10 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
 
                     return $tracks;
                 },
+
+                'tracksMap' => function() use ($trackRepo) {
+                    return $trackRepo->findAll();
+                }
             ],
         ];
     }
