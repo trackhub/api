@@ -1,4 +1,4 @@
 type RootQuery {
   tracks(limit: Int!): [Track]
-  tracksMap(lat: Float): [Track]
+  tracksMap(sessionId: String!, lat: Float!, lng: Float!): [Track]
 }

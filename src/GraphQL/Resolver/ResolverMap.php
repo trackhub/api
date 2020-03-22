@@ -32,7 +32,16 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
                     return $tracks;
                 },
 
-                'tracksMap' => function() use ($trackRepo) {
+                'tracksMap' => function($root, ArgumentInterface $ai, \ArrayObject $resolveInfo) use ($trackRepo) {
+                    if ($root !== null) {
+                        throw new \Exception("not implemented");
+                    }
+
+                    $session = $ai['sessionId'];
+
+                    $qb = $trackRepo->createQueryBuilder('t');
+                    $trackRepo->andWhereInCoordinates($qb, [], );
+
                     return $trackRepo->findAll();
                 }
             ],
