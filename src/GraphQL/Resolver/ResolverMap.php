@@ -50,6 +50,8 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
                         $ai['swLon'],
                     );
 
+                    $trackRepo->andWhereTrackIsPublic($qb);
+
                     return $trackRepo->findAll();
                 }
             ],
