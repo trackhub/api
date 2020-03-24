@@ -37,10 +37,18 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
                         throw new \Exception("not implemented");
                     }
 
+                    // @TODO
                     $session = $ai['sessionId'];
 
                     $qb = $trackRepo->createQueryBuilder('t');
-                    $trackRepo->andWhereInCoordinates($qb, [], );
+                    $trackRepo->andWhereInCoordinates(
+                        $qb,
+                        [], // session id
+                        $ai['neLat'],
+                        $ai['swLat'],
+                        $ai['neLon'],
+                        $ai['swLon'],
+                    );
 
                     return $trackRepo->findAll();
                 }
