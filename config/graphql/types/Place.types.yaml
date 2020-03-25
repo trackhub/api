@@ -1,0 +1,10 @@
+Place:
+  type: object
+  config:
+    fields:
+      id: String!
+      nameEn: String
+      nameBg: String
+      lat: Float!
+      lng: Float!
+      type: Int!

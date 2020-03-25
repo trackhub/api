@@ -7,7 +7,7 @@ namespace App\GraphQL\Resolver;
 use App\Repository\TrackRepository;
 use Overblog\GraphQLBundle\Definition\ArgumentInterface;
 
-class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
+class TrackResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
 {
     private TrackRepository $trackRepo;
 

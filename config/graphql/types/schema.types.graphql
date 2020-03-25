@@ -8,4 +8,6 @@ type RootQuery {
     swLon: Float,
     skipTracks: [String!]!
   ): [Track]
+
+  places(limit: Int): [Place]
 }

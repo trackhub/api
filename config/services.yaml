@@ -26,12 +26,20 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    App\GraphQL\Resolver\ResolverMap:
+    App\GraphQL\Resolver\TrackResolverMap:
+        tags:
+            - { name: overblog_graphql.resolver_map, schema: default }
+
+    App\GraphQL\Resolver\PlaceResolverMap:
         tags:
             - { name: overblog_graphql.resolver_map, schema: default }
 
     App\Repository\TrackRepository:
-        class: App\Repository\TrackRepository
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - App\Entity\Track
+
+    App\Repository\PlaceRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Place
