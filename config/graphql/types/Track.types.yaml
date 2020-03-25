@@ -1,18 +1,16 @@
 Track:
   type: object
   config:
-#    resolveField: '@=resolver("DefaultResolver::defaultMethod", [value, info, args])'
     fields:
       id:
-        type: String!
+        type: 'String!'
       slug:
-        type: String
+        type: 'String'
+      slugOrId:
+        type: 'String!'
       nameEn:
-        type: String
+        type: 'String'
       visibility:
-        type: Int!
+        type: 'Int!'
       optimizedPoints:
-        type: "[Point]"
-# add resolver
-#      createdAt:
-#        type: Int
+        type: '[Point]'
