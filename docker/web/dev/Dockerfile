@@ -1,4 +1,4 @@
-FROM trackhub-web
+FROM trackhub-api-web
 
 RUN a2ensite 000-default-ssl
 
