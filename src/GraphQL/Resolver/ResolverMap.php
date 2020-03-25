@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\GraphQL\Resolver;
 
 use App\Repository\TrackRepository;
@@ -21,13 +23,15 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
         return [
             'RootQuery' => [
                 'tracks' => function ($root, ArgumentInterface $ai, \ArrayObject $resolveInfo) use ($trackRepo) {
+                    // this is still in development!
                     if ($root !== null) {
                         throw new \Exception("not implemented");
                     }
 
-                    $limit = $ai['limit'];
+                    $qb = $trackRepo->createQueryBuilder('t');
+                    $qb->setMaxResults($ai['limit']);
 
-                    $tracks = $trackRepo->findAll();
+                    $tracks = $qb->getQuery()->getResult();
 
                     return $tracks;
                 },
@@ -37,13 +41,10 @@ class ResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
                         throw new \Exception("not implemented");
                     }
 
-                    // @TODO
-                    $session = $ai['sessionId'];
-
                     $qb = $trackRepo->createQueryBuilder('t');
                     $trackRepo->andWhereInCoordinates(
                         $qb,
-                        [], // session id
+                        $ai['skipTracks'],
                         $ai['neLat'],
                         $ai['swLat'],
                         $ai['neLon'],

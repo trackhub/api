@@ -1,4 +1,11 @@
 type RootQuery {
   tracks(limit: Int!): [Track]
-  tracksMap(sessionId: String!, neLat: Float!, swLat: Float!, neLon: Float!, swLon: Float): [Track]
+
+  tracksMap(
+    neLat: Float!,
+    swLat: Float!,
+    neLon: Float!,
+    swLon: Float,
+    skipTracks: [String!]!
+  ): [Track]
 }
