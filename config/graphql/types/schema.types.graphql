@@ -10,4 +10,12 @@ type RootQuery {
   ): [Track]
 
   places(limit: Int): [Place]
+
+  placesMap(
+    neLat: Float!,
+    swLat: Float!,
+    neLon: Float!,
+    swLon: Float,
+    skipPlaces: [String!]!
+  ): [Place]
 }

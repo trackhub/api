@@ -6,8 +6,9 @@ namespace App\GraphQL\Resolver;
 
 use App\Repository\TrackRepository;
 use Overblog\GraphQLBundle\Definition\ArgumentInterface;
+use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
-class TrackResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
+class TrackResolverMap extends ResolverMap
 {
     private TrackRepository $trackRepo;
 
@@ -23,7 +24,7 @@ class TrackResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
         return [
             'RootQuery' => [
                 'tracks' => function ($root, ArgumentInterface $ai, \ArrayObject $resolveInfo) use ($trackRepo) {
-                    // this is still in development!
+                    // this endpoint is still in development!
                     if ($root !== null) {
                         throw new \Exception("not implemented");
                     }
@@ -52,6 +53,7 @@ class TrackResolverMap extends \Overblog\GraphQLBundle\Resolver\ResolverMap
                     );
 
                     $trackRepo->andWhereTrackIsPublic($qb);
+                    $qb->setMaxResults(10);
 
                     return $trackRepo->findAll();
                 }
