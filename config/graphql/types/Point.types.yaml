@@ -1,0 +1,8 @@
+Point:
+  type: object
+  config:
+    fields:
+      lat:
+        type: Float!
+      lng:
+        type: Float!

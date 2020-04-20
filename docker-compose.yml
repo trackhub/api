@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  th-gql-web:
+    restart: unless-stopped
+    build: docker/web/dev
+    volumes:
+    - ./:/var/www
+    environment:
+    - WEB_UID=${WEB_UID}
+# Later we will move the sql container in this project
+#    depends_on:
+#      - sql
+#  sql:
+#    restart: unless-stopped
+#    image: mariadb:10.3
+#    environment:
+#      MYSQL_ROOT_PASSWORD: 1
+#      MYSQL_USER: gps
+#      MYSQL_PASSWORD: 1
+#      MYSQL_DATABASE: gps
+#    volumes:
+#    - database_data:/var/lib/mysql
+#
+#volumes:
+#  database_data:
