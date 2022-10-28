@@ -14,6 +14,11 @@ type Todo struct {
 	User *User  `json:"user"`
 }
 
+type Track struct {
+	Name     *string `json:"name"`
+	IDOrName string  `json:"idOrName"`
+}
+
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`

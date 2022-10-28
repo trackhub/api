@@ -5,5 +5,5 @@ services:
     build: docker/web/dev
     volumes:
       # volumes used by IDE
-      - ./docker/tmp/gopath:/go
-      - ./docker/tmp/goroot:/go-root-host
+      - ./docker/.tmp/gopath:/go
+      - ./docker/.tmp/goroot:/go-root-host

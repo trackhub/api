@@ -26,3 +26,8 @@ input NewTodo {
 type Mutation {
   createTodo(input: NewTodo!): Todo!
 }
+
+type Track {
+    name: String
+    idOrName: String!
+}
