@@ -7,12 +7,20 @@ set -e
 # In this case assign WEB_UID to 1000
 [[ $UID == 0 ]] && export WEB_UID=1000 || export WEB_UID=$UID
 
+if [[ "$1" == "dev" ]]; then
+    rm docker/web/dev/goroot -rf || echo "Unable to delete goroot"
+    echo "dev"
+fi
+
 docker build --tag=trackhub-api-web ./docker/web/
 docker-compose -p track build
 
-if [[ "$1" == "-p" ]]; then
-    docker-compose -p track -f docker-compose.yml -f docker-compose-prod.yml build
-    docker-compose -p track -f docker-compose.yml -f docker-compose-prod.yml up
+if [[ "$1" == "prod" ]]; then
+  echo "Not implemented"
+  exit 1
 else
-    docker-compose -p track up
+  if [[ "$1" == "dev" ]]; then
+    docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml build
+    docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml up
+  fi
 fi

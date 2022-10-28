@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  th-gql-web:
+    build: docker/web/dev
+    volumes:
+      # volumes used by IDE
+      - ./docker/tmp/gopath:/go
+      - ./docker/tmp/goroot:/go-root-host

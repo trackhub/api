@@ -2,8 +2,8 @@
 
 set -e
 
-usermod -u $WEB_UID www-data
+# usermod -u $WEB_UID app
+cp /usr/local/go/* /go-root-host/ -r
+chown $WEB_UID /go-root-host/ -R
 
-su www-data bash -c "composer install -d /var/www"
-
-apachectl -D FOREGROUND
+tail -f /var/log/*

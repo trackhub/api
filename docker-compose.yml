@@ -5,9 +5,9 @@ services:
     restart: unless-stopped
     build: docker/web/dev
     volumes:
-    - ./:/var/www
+      - ./:/app
     environment:
-    - WEB_UID=${WEB_UID}
+      - WEB_UID=${WEB_UID}
 # Later we will move the sql container in this project
 #    depends_on:
 #      - sql
