@@ -1,9 +1,12 @@
 package main
 
 import (
+	"os"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	"github.com/trackhub/api/graph"
 	"github.com/trackhub/api/graph/generated"
@@ -34,9 +37,10 @@ func playgroundHandler() gin.HandlerFunc {
 }
 
 func main() {
-	// Setting up Gin
+	godotenv.Load()
+
 	r := gin.Default()
 	r.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
-	r.Run()
+	r.Run(":" + os.Getenv("PORT"))
 }
