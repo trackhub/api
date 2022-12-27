@@ -22,5 +22,8 @@ else
   if [[ "$1" == "dev" ]]; then
     docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml build
     docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml up
+  else
+    echo "unknown env"
+    exit 1
   fi
 fi

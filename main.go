@@ -40,7 +40,23 @@ func main() {
 	godotenv.Load()
 
 	r := gin.Default()
-	r.POST("/query", graphqlHandler())
+
+	hf := func(ctx *gin.Context) {
+		auth := ctx.Request.Header.Get("auth")
+		if auth != "test123" {
+			// ctx.JSON(500, map[string]string{"test123": "da"})
+			// do ctx.Abort() to cancel the request
+			return
+		}
+
+		ctx.Next()
+	}
+
+	g := r.Group("/")
+	g.Use(hf)
+
+	g.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
+
 	r.Run(":" + os.Getenv("PORT"))
 }
