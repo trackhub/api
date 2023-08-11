@@ -23,7 +23,7 @@ else
     docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml build
     docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml up
   else
-    echo "unknown env"
+    echo "unknown env. Provide env as argument"
     exit 1
   fi
 fi
