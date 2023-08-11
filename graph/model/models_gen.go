@@ -2,24 +2,21 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
 type Track struct {
-	Name     *string `json:"name"`
-	IDOrName string  `json:"idOrName"`
+	Name     *string         `json:"name,omitempty"`
+	IDOrName string          `json:"idOrName"`
+	Version  []*TrackVersion `json:"version,omitempty"`
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type TrackPoint struct {
+	ID        string  `json:"id"`
+	Order     int     `json:"order"`
+	Lat       float64 `json:"lat"`
+	Lng       float64 `json:"lng"`
+	Elevation float64 `json:"elevation"`
+}
+
+type TrackVersion struct {
+	ID     string        `json:"id"`
+	Points []*TrackPoint `json:"Points,omitempty"`
 }
