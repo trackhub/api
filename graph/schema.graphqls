@@ -14,8 +14,16 @@ type User {
   name: String!
 }
 
+type Point {
+  lat: Float!
+  lng: Float!
+}
+
 type Query {
-  todos: [Todo!]!
+  listTracks(
+    skipPlaces: [String!]
+    skipTracks: [String!]
+  ): [Track!]!
 }
 
 input NewTodo {
@@ -28,6 +36,9 @@ type Mutation {
 }
 
 type Track {
+    id: String!
     name: String
-    idOrName: String!
+    slugOrId: String!
+    points: [Point!]
+    type: Int
 }
