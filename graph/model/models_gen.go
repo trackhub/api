@@ -2,27 +2,12 @@
 
 package model
 
-type Mutation struct {
-}
-
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
 type Point struct {
 	Lat float64 `json:"lat"`
 	Lng float64 `json:"lng"`
 }
 
 type Query struct {
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
 }
 
 type Track struct {
