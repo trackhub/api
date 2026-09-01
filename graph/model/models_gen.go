@@ -2,9 +2,15 @@
 
 package model
 
+type Mutation struct {
+}
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
+}
+
+type Query struct {
 }
 
 type Todo struct {
@@ -15,7 +21,7 @@ type Todo struct {
 }
 
 type Track struct {
-	Name     *string `json:"name"`
+	Name     *string `json:"name,omitempty"`
 	IDOrName string  `json:"idOrName"`
 }
 
