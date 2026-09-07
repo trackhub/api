@@ -7,17 +7,23 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/trackhub/api/graph/generated"
 	"github.com/trackhub/api/graph/model"
 )
 
 // ListTracks is the resolver for the listTracks field.
-func (r *queryResolver) ListTracks(ctx context.Context, skipPlaces []string, skipTracks []string) ([]*model.Track, error) {
+func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string) ([]*model.Track, error) {
 	tracks := make([]*model.Track, 0, 10)
 	tracks = append(tracks, &model.Track{ID: "123", SlugOrID: "test-name-123"})
 
 	return tracks, nil
+}
+
+// ListPlaces is the resolver for the listPlaces field.
+func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string) ([]*model.Place, error) {
+	panic(fmt.Errorf("not implemented: ListPlaces - listPlaces"))
 }
 
 // Query returns generated.QueryResolver implementation.

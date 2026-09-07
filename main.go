@@ -18,7 +18,11 @@ func graphqlHandler() gin.HandlerFunc {
 	// Resolver is in the resolver.go file
 	h := handler.NewDefaultServer(
 		generated.NewExecutableSchema(
-			generated.Config{Resolvers: &graph.Resolver{}},
+			generated.Config{
+				Resolvers: &graph.Resolver{
+					DB: graph.InitDB(),
+				},
+			},
 		),
 	)
 

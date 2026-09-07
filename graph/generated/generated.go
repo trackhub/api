@@ -35,13 +35,24 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Place struct {
+		Attraction func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Icon       func(childComplexity int) int
+		Lat        func(childComplexity int) int
+		Lng        func(childComplexity int) int
+		Name       func(childComplexity int) int
+		SlugOrID   func(childComplexity int) int
+	}
+
 	Point struct {
 		Lat func(childComplexity int) int
 		Lng func(childComplexity int) int
 	}
 
 	Query struct {
-		ListTracks func(childComplexity int, skipPlaces []string, skipTracks []string) int
+		ListPlaces func(childComplexity int, skipPlaces []string) int
+		ListTracks func(childComplexity int, skipTracks []string) int
 	}
 
 	Track struct {
@@ -63,7 +74,8 @@ type ComplexityRoot struct {
 // region    ************************** generated!.gotpl **************************
 
 type QueryResolver interface {
-	ListTracks(ctx context.Context, skipPlaces []string, skipTracks []string) ([]*model.Track, error)
+	ListTracks(ctx context.Context, skipTracks []string) ([]*model.Track, error)
+	ListPlaces(ctx context.Context, skipPlaces []string) ([]*model.Place, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -84,6 +96,49 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Place.attraction":
+		if e.ComplexityRoot.Place.Attraction == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.Attraction(childComplexity), true
+	case "Place.id":
+		if e.ComplexityRoot.Place.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.ID(childComplexity), true
+	case "Place.icon":
+		if e.ComplexityRoot.Place.Icon == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.Icon(childComplexity), true
+	case "Place.lat":
+		if e.ComplexityRoot.Place.Lat == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.Lat(childComplexity), true
+	case "Place.lng":
+		if e.ComplexityRoot.Place.Lng == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.Lng(childComplexity), true
+	case "Place.name":
+		if e.ComplexityRoot.Place.Name == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.Name(childComplexity), true
+	case "Place.slugOrId":
+		if e.ComplexityRoot.Place.SlugOrID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.SlugOrID(childComplexity), true
+
 	case "Point.lat":
 		if e.ComplexityRoot.Point.Lat == nil {
 			break
@@ -97,6 +152,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.Point.Lng(childComplexity), true
 
+	case "Query.listPlaces":
+		if e.ComplexityRoot.Query.ListPlaces == nil {
+			break
+		}
+
+		args, err := ec.field_Query_listPlaces_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.ListPlaces(childComplexity, args["skipPlaces"].([]string)), true
 	case "Query.listTracks":
 		if e.ComplexityRoot.Query.ListTracks == nil {
 			break
@@ -107,7 +173,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.ListTracks(childComplexity, args["skipPlaces"].([]string), args["skipTracks"].([]string)), true
+		return e.ComplexityRoot.Query.ListTracks(childComplexity, args["skipTracks"].([]string)), true
 
 	case "Track.id":
 		if e.ComplexityRoot.Track.ID == nil {
@@ -236,17 +302,30 @@ type Point {
 
 type Query {
   listTracks(
-    skipPlaces: [String!]
     skipTracks: [String!]
   ): [Track!]!
+
+  listPlaces(
+    skipPlaces: [String!]
+  ): [Place!]!
+}
+
+type Place {
+  attraction: Boolean
+  id: String!
+  slugOrId: String!
+  name: String
+  icon: String
+  lat: Float
+  lng: Float
 }
 
 type Track {
-    id: String!
-    name: String
-    slugOrId: String!
-    points: [Point!]
-    type: Int
+  id: String!
+  name: String
+  slugOrId: String!
+  points: [Point!]
+  type: Int
 }
 `, BuiltIn: false},
 }
@@ -255,6 +334,26 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // childFields_* functions provide shared child field context lookups.
 // Each function is generated once per unique object type, deduplicating the
 // switch statements that were previously inlined in every fieldContext_* function.
+
+func (ec *executionContext) childFields_Place(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "attraction":
+		return ec.fieldContext_Place_attraction(ctx, field)
+	case "id":
+		return ec.fieldContext_Place_id(ctx, field)
+	case "slugOrId":
+		return ec.fieldContext_Place_slugOrId(ctx, field)
+	case "name":
+		return ec.fieldContext_Place_name(ctx, field)
+	case "icon":
+		return ec.fieldContext_Place_icon(ctx, field)
+	case "lat":
+		return ec.fieldContext_Place_lat(ctx, field)
+	case "lng":
+		return ec.fieldContext_Place_lng(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
+}
 
 func (ec *executionContext) childFields_Point(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 	switch field.Name {
@@ -412,7 +511,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_listTracks_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+func (ec *executionContext) field_Query_listPlaces_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "skipPlaces",
@@ -423,14 +522,20 @@ func (ec *executionContext) field_Query_listTracks_args(ctx context.Context, raw
 		return nil, err
 	}
 	args["skipPlaces"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "skipTracks",
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_listTracks_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "skipTracks",
 		func(ctx context.Context, v any) ([]string, error) {
 			return ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 		})
 	if err != nil {
 		return nil, err
 	}
-	args["skipTracks"] = arg1
+	args["skipTracks"] = arg0
 	return args, nil
 }
 
@@ -494,6 +599,167 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _Place_attraction(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_attraction(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Attraction, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *bool) graphql.Marshaler {
+			return ec.marshalOBoolean2ᚖbool(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Place_attraction(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type Boolean does not have child fields"))
+}
+
+func (ec *executionContext) _Place_id(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Place_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Place_slugOrId(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_slugOrId(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.SlugOrID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Place_slugOrId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Place_name(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_name(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Place_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Place_icon(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_icon(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Icon, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Place_icon(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Place_lat(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_lat(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Lat, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *float64) graphql.Marshaler {
+			return ec.marshalOFloat2ᚖfloat64(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Place_lat(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _Place_lng(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_lng(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Lng, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *float64) graphql.Marshaler {
+			return ec.marshalOFloat2ᚖfloat64(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Place_lng(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
 func (ec *executionContext) _Point_lat(ctx context.Context, field graphql.CollectedField, obj *model.Point) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -550,7 +816,7 @@ func (ec *executionContext) _Query_listTracks(ctx context.Context, field graphql
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().ListTracks(ctx, fc.Args["skipPlaces"].([]string), fc.Args["skipTracks"].([]string))
+			return ec.Resolvers.Query().ListTracks(ctx, fc.Args["skipTracks"].([]string))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v []*model.Track) graphql.Marshaler {
@@ -578,6 +844,50 @@ func (ec *executionContext) fieldContext_Query_listTracks(ctx context.Context, f
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_listTracks_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_listPlaces(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_listPlaces(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().ListPlaces(ctx, fc.Args["skipPlaces"].([]string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Place) graphql.Marshaler {
+			return ec.marshalNPlace2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlaceᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_listPlaces(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Place(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_listPlaces_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1897,6 +2207,74 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** object.gotpl ****************************
 
+var placeImplementors = []string{"Place"}
+
+func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, obj *model.Place) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, placeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferredFieldSet := graphql.NewFieldSet(nil)
+	deferLabelToView := make(map[string]*graphql.FieldSetView)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Place")
+		case "attraction":
+			out.Values[i] = ec._Place_attraction(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
+		case "id":
+			out.Values[i] = ec._Place_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "slugOrId":
+			out.Values[i] = ec._Place_slugOrId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Place_name(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
+		case "icon":
+			out.Values[i] = ec._Place_icon(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
+		case "lat":
+			out.Values[i] = ec._Place_lat(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
+		case "lng":
+			out.Values[i] = ec._Place_lng(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+	ec.ProcessDeferredGroup(graphql.DeferredGroup{
+		Defers:   deferLabelToView,
+		Path:     graphql.GetPath(ctx),
+		FieldSet: deferredFieldSet,
+		Context:  ctx,
+	})
+
+	return out
+}
+
 var pointImplementors = []string{"Point"}
 
 func (ec *executionContext) _Point(ctx context.Context, sel ast.SelectionSet, obj *model.Point) graphql.Marshaler {
@@ -1970,6 +2348,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_listTracks(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "listPlaces":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_listPlaces(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -2558,6 +2958,32 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) marshalNPlace2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlaceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Place) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNPlace2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlace(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPlace2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlace(ctx context.Context, sel ast.SelectionSet, v *model.Place) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Place(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNPoint2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPoint(ctx context.Context, sel ast.SelectionSet, v *model.Point) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -2778,6 +3204,23 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v any) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {

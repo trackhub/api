@@ -14,15 +14,28 @@ type Point {
 
 type Query {
   listTracks(
-    skipPlaces: [String!]
     skipTracks: [String!]
   ): [Track!]!
+
+  listPlaces(
+    skipPlaces: [String!]
+  ): [Place!]!
+}
+
+type Place {
+  attraction: Boolean
+  id: String!
+  slugOrId: String!
+  name: String
+  icon: String
+  lat: Float
+  lng: Float
 }
 
 type Track {
-    id: String!
-    name: String
-    slugOrId: String!
-    points: [Point!]
-    type: Int
+  id: String!
+  name: String
+  slugOrId: String!
+  points: [Point!]
+  type: Int
 }

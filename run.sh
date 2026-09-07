@@ -13,15 +13,15 @@ if [[ "$1" == "dev" ]]; then
 fi
 
 docker build --tag=trackhub-api-web ./docker/web/
-docker-compose -p track build
+docker compose -p track build
 
 if [[ "$1" == "prod" ]]; then
   echo "Not implemented"
   exit 1
 else
   if [[ "$1" == "dev" ]]; then
-    docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml build
-    docker-compose -p track -f docker-compose.yml -f docker-compose-dev.yml up
+    docker compose -p track -f docker-compose.yml -f docker-compose-dev.yml build
+    docker compose -p track -f docker-compose.yml -f docker-compose-dev.yml up
   else
     echo "unknown env"
     exit 1
