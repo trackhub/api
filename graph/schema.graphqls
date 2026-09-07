@@ -2,32 +2,40 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
-}
-
 type User {
   id: ID!
   name: String!
 }
 
+type Point {
+  lat: Float!
+  lng: Float!
+}
+
 type Query {
-  todos: [Todo!]!
+  listTracks(
+    skipTracks: [String!]
+  ): [Track!]!
+
+  listPlaces(
+    skipPlaces: [String!]
+  ): [Place!]!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
-}
-
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
+type Place {
+  attraction: Boolean
+  id: String!
+  slugOrId: String!
+  name: String
+  icon: String
+  lat: Float
+  lng: Float
 }
 
 type Track {
-    name: String
-    idOrName: String!
+  id: String!
+  name: String
+  slugOrId: String!
+  points: [Point!]
+  type: Int
 }

@@ -13,23 +13,20 @@ import (
 	"github.com/trackhub/api/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// ListTracks is the resolver for the listTracks field.
+func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string) ([]*model.Track, error) {
+	tracks := make([]*model.Track, 0, 10)
+	tracks = append(tracks, &model.Track{ID: "123", SlugOrID: "test-name-123"})
+
+	return tracks, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// ListPlaces is the resolver for the listPlaces field.
+func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string) ([]*model.Place, error) {
+	panic(fmt.Errorf("not implemented: ListPlaces - listPlaces"))
 }
-
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-type (
-	mutationResolver struct{ *Resolver }
-	queryResolver    struct{ *Resolver }
-)
+type queryResolver struct{ *Resolver }

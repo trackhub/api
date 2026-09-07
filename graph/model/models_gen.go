@@ -2,27 +2,30 @@
 
 package model
 
-type Mutation struct {
+type Place struct {
+	Attraction *bool    `json:"attraction,omitempty"`
+	ID         string   `json:"id"`
+	SlugOrID   string   `json:"slugOrId"`
+	Name       *string  `json:"name,omitempty"`
+	Icon       *string  `json:"icon,omitempty"`
+	Lat        *float64 `json:"lat,omitempty"`
+	Lng        *float64 `json:"lng,omitempty"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type Point struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
 }
 
 type Query struct {
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
 type Track struct {
-	Name     *string `json:"name,omitempty"`
-	IDOrName string  `json:"idOrName"`
+	ID       string   `json:"id"`
+	Name     *string  `json:"name,omitempty"`
+	SlugOrID string   `json:"slugOrId"`
+	Points   []*Point `json:"points,omitempty"`
+	Type     *int     `json:"type,omitempty"`
 }
 
 type User struct {
