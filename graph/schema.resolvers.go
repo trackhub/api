@@ -9,6 +9,8 @@ import (
 	"context"
 	"fmt"
 
+	gormGen "github.com/trackhub/api/gorm/generated"
+	gormModel "github.com/trackhub/api/gorm/model"
 	"github.com/trackhub/api/graph/generated"
 	"github.com/trackhub/api/graph/model"
 )
@@ -16,7 +18,24 @@ import (
 // ListTracks is the resolver for the listTracks field.
 func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string) ([]*model.Track, error) {
 	tracks := make([]*model.Track, 0, 10)
-	tracks = append(tracks, &model.Track{ID: "123", SlugOrID: "test-name-123"})
+
+	// @TODO remove already fetched tracks
+
+	gormTracks, err := gormGen.Query[gormModel.Track](r.DB).FindAll(nil)
+
+	if err != nil {
+		panic("error fetching from db " + err.Error())
+	}
+
+	for _, gormTrack := range gormTracks {
+		tracks = append(
+			tracks,
+			&model.Track{
+				ID:       gormTrack.ID,
+				SlugOrID: gormTrack.SlugOrId(),
+			},
+		)
+	}
 
 	return tracks, nil
 }
