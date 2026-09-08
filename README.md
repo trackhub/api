@@ -1,9 +1,9 @@
 # Regenerating gqlgen
 ```
-gqlgen generate
+go tool gqlgen
 ```
 
 # Regenerating gorm models
 ```
-/home/app/go/bin/gorm gen -i gorm/model/ -o gorm/generated
+go tool gen -i gorm/model/ -o gorm/generated
 ```
