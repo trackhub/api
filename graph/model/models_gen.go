@@ -28,6 +28,11 @@ type Track struct {
 	Type     *int     `json:"type,omitempty"`
 }
 
+type TrackListResult struct {
+	Tracks []*Track `json:"tracks"`
+	Status int      `json:"status"`
+}
+
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`

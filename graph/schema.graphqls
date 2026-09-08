@@ -15,7 +15,7 @@ type Point {
 type Query {
   listTracks(
     skipTracks: [String!]
-  ): [Track!]!
+  ): TrackListResult!
 
   listPlaces(
     skipPlaces: [String!]
@@ -38,4 +38,9 @@ type Track {
   slugOrId: String!
   points: [Point!]
   type: Int
+}
+
+type TrackListResult {
+  tracks: [Track]!
+  status: Int!
 }

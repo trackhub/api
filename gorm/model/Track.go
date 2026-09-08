@@ -19,6 +19,6 @@ func (Track) TableName() string {
 }
 
 type Query[T any] interface {
-	// SELECT * FROM @@table
-	FindAll() ([]T, error)
+	// SELECT * FROM @@table WHERE id NOT IN @ids
+	FindAllNotInId(ids []string, limit int) ([]T, error)
 }

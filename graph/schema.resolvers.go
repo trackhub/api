@@ -7,7 +7,9 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
 
 	gormGen "github.com/trackhub/api/gorm/generated"
 	gormModel "github.com/trackhub/api/gorm/model"
@@ -16,18 +18,26 @@ import (
 )
 
 // ListTracks is the resolver for the listTracks field.
-func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string) ([]*model.Track, error) {
+func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string) (*model.TrackListResult, error) {
+	result := &model.TrackListResult{}
+
 	tracks := make([]*model.Track, 0, 10)
 
-	// @TODO remove already fetched tracks
-
-	gormTracks, err := gormGen.Query[gormModel.Track](r.DB).FindAll(nil)
+	gormTracks, err := gormGen.Query[gormModel.Track](r.DB).FindAllNotInId(nil, skipTracks, 11)
 
 	if err != nil {
-		panic("error fetching from db " + err.Error())
+		log.Println("Unalbe to fetch tracks", err)
+		return nil, errors.New("Unable to fetch tracs")
 	}
 
+	trackCount := 0
 	for _, gormTrack := range gormTracks {
+		trackCount += 1
+		if trackCount > 10 {
+			result.Status = 1
+			break
+		}
+
 		tracks = append(
 			tracks,
 			&model.Track{
@@ -37,7 +47,9 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string) ([]
 		)
 	}
 
-	return tracks, nil
+	result.Tracks = tracks
+
+	return result, nil
 }
 
 // ListPlaces is the resolver for the listPlaces field.
