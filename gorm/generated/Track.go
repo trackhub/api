@@ -54,8 +54,10 @@ var Track = struct {
 	ID   field.String
 	Name field.String
 	Slug field.String
+	Type field.Number[int]
 }{
 	ID:   field.String{}.WithColumn("id"),
 	Name: field.String{}.WithColumn("name"),
 	Slug: field.String{}.WithColumn("slug"),
+	Type: field.Number[int]{}.WithColumn("type"),
 }

@@ -23,7 +23,6 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 
 	tracks := make([]*model.Track, 0, 10)
 
-	// @TODO inject coords
 	gormTracks, err := gormGen.Query[gormModel.Track](r.DB).FindAllPublicNotInId(
 		ctx,
 		skipTracks,
@@ -52,6 +51,7 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 			&model.Track{
 				ID:       gormTrack.ID,
 				SlugOrID: gormTrack.SlugOrId(),
+				Type:     &gormTrack.Type,
 			},
 		)
 	}

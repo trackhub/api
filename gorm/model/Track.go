@@ -6,6 +6,7 @@ type Track struct {
 	ID   string `gorm:"type:uuid;primaryKey"`
 	Name string
 	Slug *string
+	Type int
 }
 
 func (t Track) SlugOrId() string {
