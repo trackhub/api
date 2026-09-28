@@ -20,19 +20,30 @@ func Query[T any](db *gorm.DB, opts ...clause.Expression) _QueryInterface[T] {
 
 type _QueryInterface[T any] interface {
 	typed.Interface[T]
-	FindAllNotInId(ctx context.Context, ids []string, limit int) ([]T, error)
+	FindAllPublicNotInId(ctx context.Context, ids []string, limit int, neLat float64, swLat float64, neLon float64, swLon float64) ([]T, error)
 }
 
 type _QueryImpl[T any] struct {
 	typed.Interface[T]
 }
 
-func (e _QueryImpl[T]) FindAllNotInId(ctx context.Context, ids []string, limit int) ([]T, error) {
+func (e _QueryImpl[T]) FindAllPublicNotInId(ctx context.Context, ids []string, limit int, neLat float64, swLat float64, neLon float64, swLon float64) ([]T, error) {
 	var sb strings.Builder
-	_params := make([]any, 0, 2)
+	_params := make([]any, 0, 7)
 
-	sb.WriteString("SELECT * FROM ? WHERE id NOT IN ?")
-	_params = append(_params, clause.Table{Name: clause.CurrentTable}, ids)
+	sb.WriteString("SELECT * FROM ?")
+	_params = append(_params, clause.Table{Name: clause.CurrentTable})
+	sb.WriteString(" WHERE (? IS NULL OR id NOT IN ?)")
+	_params = append(_params, ids, ids)
+	sb.WriteString(" AND visibility = 0")
+	sb.WriteString(" AND point_north_east_lat <= ?")
+	_params = append(_params, neLat)
+	sb.WriteString(" AND point_south_west_lat >= ?")
+	_params = append(_params, swLat)
+	sb.WriteString(" AND point_north_east_lng <= ?")
+	_params = append(_params, neLon)
+	sb.WriteString(" AND point_south_west_lng >= ?")
+	_params = append(_params, swLon)
 
 	var result []T
 	err := e.Raw(sb.String(), _params...).Scan(ctx, &result)

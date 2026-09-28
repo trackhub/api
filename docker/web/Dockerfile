@@ -9,12 +9,8 @@ RUN ln -s /usr/local/go/bin/go /usr/local/bin/ && \
 
 RUN adduser app
 
-ENV GQL_VERSION="0.17.94"
-RUN cd /root && \
-    wget https://github.com/99designs/gqlgen/archive/refs/tags/v${GQL_VERSION}.tar.gz -O gqlgen.tar.gz && \
-    tar -xf gqlgen.tar.gz && \
-    cd gqlgen-${GQL_VERSION} && \
-    go build main.go && \
-    mv main /bin/gqlgen
+USER app
+
+ENV PATH="usr/local/go/bin/:${PATH}"
 
 WORKDIR /app

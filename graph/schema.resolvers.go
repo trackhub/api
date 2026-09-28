@@ -18,12 +18,21 @@ import (
 )
 
 // ListTracks is the resolver for the listTracks field.
-func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string) (*model.TrackListResult, error) {
+func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error) {
 	result := &model.TrackListResult{}
 
 	tracks := make([]*model.Track, 0, 10)
 
-	gormTracks, err := gormGen.Query[gormModel.Track](r.DB).FindAllNotInId(nil, skipTracks, 11)
+	// @TODO inject coords
+	gormTracks, err := gormGen.Query[gormModel.Track](r.DB).FindAllPublicNotInId(
+		ctx,
+		skipTracks,
+		11,
+		neLat,
+		swLat,
+		neLon,
+		swLon,
+	)
 
 	if err != nil {
 		log.Println("Unalbe to fetch tracks", err)

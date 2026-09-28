@@ -52,7 +52,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		ListPlaces func(childComplexity int, skipPlaces []string) int
-		ListTracks func(childComplexity int, skipTracks []string) int
+		ListTracks func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) int
 	}
 
 	Track struct {
@@ -79,7 +79,7 @@ type ComplexityRoot struct {
 // region    ************************** generated!.gotpl **************************
 
 type QueryResolver interface {
-	ListTracks(ctx context.Context, skipTracks []string) (*model.TrackListResult, error)
+	ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error)
 	ListPlaces(ctx context.Context, skipPlaces []string) ([]*model.Place, error)
 }
 
@@ -178,7 +178,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.ListTracks(childComplexity, args["skipTracks"].([]string)), true
+		return e.ComplexityRoot.Query.ListTracks(childComplexity, args["skipTracks"].([]string), args["neLat"].(float64), args["swLat"].(float64), args["neLon"].(float64), args["swLon"].(float64)), true
 
 	case "Track.id":
 		if e.ComplexityRoot.Track.ID == nil {
@@ -321,6 +321,11 @@ type Point {
 type Query {
   listTracks(
     skipTracks: [String!]
+    neLat: Float!
+    swLat: Float!
+    neLon: Float!
+    swLon: Float!
+
   ): TrackListResult!
 
   listPlaces(
@@ -569,6 +574,38 @@ func (ec *executionContext) field_Query_listTracks_args(ctx context.Context, raw
 		return nil, err
 	}
 	args["skipTracks"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "neLat",
+		func(ctx context.Context, v any) (float64, error) {
+			return ec.unmarshalNFloat2float64(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["neLat"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "swLat",
+		func(ctx context.Context, v any) (float64, error) {
+			return ec.unmarshalNFloat2float64(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["swLat"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "neLon",
+		func(ctx context.Context, v any) (float64, error) {
+			return ec.unmarshalNFloat2float64(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["neLon"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "swLon",
+		func(ctx context.Context, v any) (float64, error) {
+			return ec.unmarshalNFloat2float64(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["swLon"] = arg4
 	return args, nil
 }
 
@@ -849,7 +886,7 @@ func (ec *executionContext) _Query_listTracks(ctx context.Context, field graphql
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().ListTracks(ctx, fc.Args["skipTracks"].([]string))
+			return ec.Resolvers.Query().ListTracks(ctx, fc.Args["skipTracks"].([]string), fc.Args["neLat"].(float64), fc.Args["swLat"].(float64), fc.Args["neLon"].(float64), fc.Args["swLon"].(float64))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.TrackListResult) graphql.Marshaler {
