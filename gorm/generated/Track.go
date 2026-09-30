@@ -3,61 +3,20 @@
 package generated
 
 import (
-	"context"
-	"strings"
-
+	"github.com/trackhub/api/gorm/model"
 	"gorm.io/cli/gorm/field"
-	"gorm.io/cli/gorm/typed"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
-func Query[T any](db *gorm.DB, opts ...clause.Expression) _QueryInterface[T] {
-	return _QueryImpl[T]{
-		Interface: typed.G[T](db, opts...),
-	}
-}
-
-type _QueryInterface[T any] interface {
-	typed.Interface[T]
-	FindAllPublicNotInId(ctx context.Context, ids []string, limit int, neLat float64, swLat float64, neLon float64, swLon float64) ([]T, error)
-}
-
-type _QueryImpl[T any] struct {
-	typed.Interface[T]
-}
-
-func (e _QueryImpl[T]) FindAllPublicNotInId(ctx context.Context, ids []string, limit int, neLat float64, swLat float64, neLon float64, swLon float64) ([]T, error) {
-	var sb strings.Builder
-	_params := make([]any, 0, 7)
-
-	sb.WriteString("SELECT * FROM ?")
-	_params = append(_params, clause.Table{Name: clause.CurrentTable})
-	sb.WriteString(" WHERE (? IS NULL OR id NOT IN ?)")
-	_params = append(_params, ids, ids)
-	sb.WriteString(" AND visibility = 0")
-	sb.WriteString(" AND point_north_east_lat <= ?")
-	_params = append(_params, neLat)
-	sb.WriteString(" AND point_south_west_lat >= ?")
-	_params = append(_params, swLat)
-	sb.WriteString(" AND point_north_east_lng <= ?")
-	_params = append(_params, neLon)
-	sb.WriteString(" AND point_south_west_lng >= ?")
-	_params = append(_params, swLon)
-
-	var result []T
-	err := e.Raw(sb.String(), _params...).Scan(ctx, &result)
-	return result, err
-}
-
 var Track = struct {
-	ID   field.String
-	Name field.String
-	Slug field.String
-	Type field.Number[int]
+	ID            field.String
+	Name          field.String
+	Slug          field.String
+	Type          field.Number[int]
+	TrackVersions field.Slice[model.TrackVersion]
 }{
-	ID:   field.String{}.WithColumn("id"),
-	Name: field.String{}.WithColumn("name"),
-	Slug: field.String{}.WithColumn("slug"),
-	Type: field.Number[int]{}.WithColumn("type"),
+	ID:            field.String{}.WithColumn("id"),
+	Name:          field.String{}.WithColumn("name"),
+	Slug:          field.String{}.WithColumn("slug"),
+	Type:          field.Number[int]{}.WithColumn("type"),
+	TrackVersions: field.Slice[model.TrackVersion]{}.WithName("TrackVersions"),
 }

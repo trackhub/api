@@ -11,8 +11,6 @@ import (
 	"fmt"
 	"log"
 
-	gormGen "github.com/trackhub/api/gorm/generated"
-	gormModel "github.com/trackhub/api/gorm/model"
 	"github.com/trackhub/api/graph/generated"
 	"github.com/trackhub/api/graph/model"
 )
@@ -23,7 +21,7 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 
 	tracks := make([]*model.Track, 0, 10)
 
-	gormTracks, err := gormGen.Query[gormModel.Track](r.DB).FindAllPublicNotInId(
+	gormTracks, err := r.TrackRepository().FindAllPublicNotInId(
 		ctx,
 		skipTracks,
 		11,
@@ -46,13 +44,22 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 			break
 		}
 
+		track := &model.Track{
+			ID:       gormTrack.ID,
+			SlugOrID: gormTrack.SlugOrId(),
+			Type:     &gormTrack.Type,
+			Versions: make([]*model.TrackVersion, 0),
+		}
+
+		for _, trackVersion := range gormTrack.TrackVersions {
+			track.Versions = append(track.Versions, &model.TrackVersion{
+				ID: trackVersion.ID,
+			})
+		}
+
 		tracks = append(
 			tracks,
-			&model.Track{
-				ID:       gormTrack.ID,
-				SlugOrID: gormTrack.SlugOrId(),
-				Type:     &gormTrack.Type,
-			},
+			track,
 		)
 	}
 

@@ -61,11 +61,16 @@ type ComplexityRoot struct {
 		Points   func(childComplexity int) int
 		SlugOrID func(childComplexity int) int
 		Type     func(childComplexity int) int
+		Versions func(childComplexity int) int
 	}
 
 	TrackListResult struct {
 		Status func(childComplexity int) int
 		Tracks func(childComplexity int) int
+	}
+
+	TrackVersion struct {
+		ID func(childComplexity int) int
 	}
 
 	User struct {
@@ -210,6 +215,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Track.Type(childComplexity), true
+	case "Track.versions":
+		if e.ComplexityRoot.Track.Versions == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Track.Versions(childComplexity), true
 
 	case "TrackListResult.status":
 		if e.ComplexityRoot.TrackListResult.Status == nil {
@@ -223,6 +234,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.TrackListResult.Tracks(childComplexity), true
+
+	case "TrackVersion.id":
+		if e.ComplexityRoot.TrackVersion.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TrackVersion.ID(childComplexity), true
 
 	case "User.id":
 		if e.ComplexityRoot.User.ID == nil {
@@ -349,6 +367,11 @@ type Track {
   slugOrId: String!
   points: [Point!]
   type: Int
+  versions: [TrackVersion!]
+}
+
+type TrackVersion {
+  id: String!
 }
 
 type TrackListResult {
@@ -405,6 +428,8 @@ func (ec *executionContext) childFields_Track(ctx context.Context, field graphql
 		return ec.fieldContext_Track_points(ctx, field)
 	case "type":
 		return ec.fieldContext_Track_type(ctx, field)
+	case "versions":
+		return ec.fieldContext_Track_versions(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Track", field.Name)
 }
@@ -417,6 +442,14 @@ func (ec *executionContext) childFields_TrackListResult(ctx context.Context, fie
 		return ec.fieldContext_TrackListResult_status(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type TrackListResult", field.Name)
+}
+
+func (ec *executionContext) childFields_TrackVersion(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "id":
+		return ec.fieldContext_TrackVersion_id(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type TrackVersion", field.Name)
 }
 
 func (ec *executionContext) childFields___Directive(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
@@ -1164,6 +1197,38 @@ func (ec *executionContext) fieldContext_Track_type(_ context.Context, field gra
 	return graphql.NewScalarFieldContext("Track", field, false, false, errors.New("field of type Int does not have child fields"))
 }
 
+func (ec *executionContext) _Track_versions(ctx context.Context, field graphql.CollectedField, obj *model.Track) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Track_versions(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Versions, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.TrackVersion) graphql.Marshaler {
+			return ec.marshalOTrackVersion2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackVersionᚄ(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Track_versions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Track",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_TrackVersion(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TrackListResult_tracks(ctx context.Context, field graphql.CollectedField, obj *model.TrackListResult) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1217,6 +1282,29 @@ func (ec *executionContext) _TrackListResult_status(ctx context.Context, field g
 }
 func (ec *executionContext) fieldContext_TrackListResult_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("TrackListResult", field, false, false, errors.New("field of type Int does not have child fields"))
+}
+
+func (ec *executionContext) _TrackVersion_id(ctx context.Context, field graphql.CollectedField, obj *model.TrackVersion) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_TrackVersion_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_TrackVersion_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("TrackVersion", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -2579,6 +2667,11 @@ func (ec *executionContext) _Track(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.RequiredNull {
 				out.Invalids++
 			}
+		case "versions":
+			out.Values[i] = ec._Track_versions(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2619,6 +2712,44 @@ func (ec *executionContext) _TrackListResult(ctx context.Context, sel ast.Select
 			}
 		case "status":
 			out.Values[i] = ec._TrackListResult_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+	ec.ProcessDeferredGroup(graphql.DeferredGroup{
+		Defers:   deferLabelToView,
+		Path:     graphql.GetPath(ctx),
+		FieldSet: deferredFieldSet,
+		Context:  ctx,
+	})
+
+	return out
+}
+
+var trackVersionImplementors = []string{"TrackVersion"}
+
+func (ec *executionContext) _TrackVersion(ctx context.Context, sel ast.SelectionSet, obj *model.TrackVersion) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trackVersionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferredFieldSet := graphql.NewFieldSet(nil)
+	deferLabelToView := make(map[string]*graphql.FieldSetView)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrackVersion")
+		case "id":
+			out.Values[i] = ec._TrackVersion_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3214,6 +3345,16 @@ func (ec *executionContext) marshalNTrackListResult2ᚖgithubᚗcomᚋtrackhub�
 	return ec._TrackListResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTrackVersion2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackVersion(ctx context.Context, sel ast.SelectionSet, v *model.TrackVersion) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrackVersion(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
 	return ec.___Directive(ctx, sel, &v)
 }
@@ -3496,6 +3637,25 @@ func (ec *executionContext) marshalOTrack2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgra
 		return graphql.Null
 	}
 	return ec._Track(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTrackVersion2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackVersionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TrackVersion) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNTrackVersion2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackVersion(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

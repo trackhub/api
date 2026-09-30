@@ -10,10 +10,16 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/trackhub/api/gorm/repository"
 )
 
 type Resolver struct {
 	DB *gorm.DB
+}
+
+func (r Resolver) TrackRepository() *repository.TrackRepository {
+	return repository.NewTrackRepository(r.DB)
 }
 
 func InitDB(user string, pass string, database string, host string) *gorm.DB {

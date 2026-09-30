@@ -43,6 +43,11 @@ type Track {
   slugOrId: String!
   points: [Point!]
   type: Int
+  versions: [TrackVersion!]
+}
+
+type TrackVersion {
+  id: String!
 }
 
 type TrackListResult {
