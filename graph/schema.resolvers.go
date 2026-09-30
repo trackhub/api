@@ -57,6 +57,13 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 			})
 		}
 
+		for _, optimizedPoint := range gormTrack.OptimizedPoints {
+			track.OptimizedPoints = append(track.OptimizedPoints, &model.Point{
+				Lat: optimizedPoint.Lat,
+				Lng: optimizedPoint.Lng,
+			})
+		}
+
 		tracks = append(
 			tracks,
 			track,

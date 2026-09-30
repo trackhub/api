@@ -21,12 +21,13 @@ type Query struct {
 }
 
 type Track struct {
-	ID       string          `json:"id"`
-	Name     *string         `json:"name,omitempty"`
-	SlugOrID string          `json:"slugOrId"`
-	Points   []*Point        `json:"points,omitempty"`
-	Type     *int            `json:"type,omitempty"`
-	Versions []*TrackVersion `json:"versions,omitempty"`
+	ID              string          `json:"id"`
+	Name            *string         `json:"name,omitempty"`
+	SlugOrID        string          `json:"slugOrId"`
+	Points          []*Point        `json:"points,omitempty"`
+	Type            *int            `json:"type,omitempty"`
+	Versions        []*TrackVersion `json:"versions,omitempty"`
+	OptimizedPoints []*Point        `json:"optimizedPoints,omitempty"`
 }
 
 type TrackListResult struct {

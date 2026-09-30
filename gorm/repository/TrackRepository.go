@@ -21,6 +21,7 @@ func (r *TrackRepository) FindAllPublicNotInId(ctx context.Context, ids []string
 	q := r.db.WithContext(ctx).
 		Model(&gormModel.Track{}).
 		Preload("TrackVersions").
+		Preload("OptimizedPoints").
 		Where("visibility = ?", gormModel.VisibilityPublic).
 		Where("point_north_east_lat <= ?", neLat).
 		Where("point_south_west_lat >= ?", swLat).

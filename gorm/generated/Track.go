@@ -8,15 +8,33 @@ import (
 )
 
 var Track = struct {
-	ID            field.String
-	Name          field.String
-	Slug          field.String
-	Type          field.Number[int]
-	TrackVersions field.Slice[model.TrackVersion]
+	ID              field.String
+	Name            field.String
+	Slug            field.String
+	Type            field.Number[int]
+	TrackVersions   field.Slice[model.TrackVersion]
+	OptimizedPoints field.Slice[model.OptimizedPoint]
 }{
-	ID:            field.String{}.WithColumn("id"),
-	Name:          field.String{}.WithColumn("name"),
-	Slug:          field.String{}.WithColumn("slug"),
-	Type:          field.Number[int]{}.WithColumn("type"),
-	TrackVersions: field.Slice[model.TrackVersion]{}.WithName("TrackVersions"),
+	ID:              field.String{}.WithColumn("id"),
+	Name:            field.String{}.WithColumn("name"),
+	Slug:            field.String{}.WithColumn("slug"),
+	Type:            field.Number[int]{}.WithColumn("type"),
+	TrackVersions:   field.Slice[model.TrackVersion]{}.WithName("TrackVersions"),
+	OptimizedPoints: field.Slice[model.OptimizedPoint]{}.WithName("OptimizedPoints"),
+}
+
+var OptimizedPoint = struct {
+	ID           field.String
+	TrackId      field.String
+	Order        field.Number[int]
+	Lat          field.Number[float64]
+	Lng          field.Number[float64]
+	VersionIndex field.Number[int]
+}{
+	ID:           field.String{}.WithColumn("id"),
+	TrackId:      field.String{}.WithColumn("track_id"),
+	Order:        field.Number[int]{}.WithColumn("order"),
+	Lat:          field.Number[float64]{}.WithColumn("lat"),
+	Lng:          field.Number[float64]{}.WithColumn("lng"),
+	VersionIndex: field.Number[int]{}.WithColumn("version_index"),
 }

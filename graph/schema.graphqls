@@ -44,6 +44,7 @@ type Track {
   points: [Point!]
   type: Int
   versions: [TrackVersion!]
+  optimizedPoints: [Point!]
 }
 
 type TrackVersion {

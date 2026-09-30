@@ -10,8 +10,10 @@ var TrackVersion = struct {
 	ID      field.String
 	TrackId field.String
 	Name    field.String
+	FileId  field.String
 }{
 	ID:      field.String{}.WithColumn("id"),
 	TrackId: field.String{}.WithColumn("track_id"),
 	Name:    field.String{}.WithColumn("name"),
+	FileId:  field.String{}.WithColumn("file_id"),
 }

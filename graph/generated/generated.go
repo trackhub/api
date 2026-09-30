@@ -56,12 +56,13 @@ type ComplexityRoot struct {
 	}
 
 	Track struct {
-		ID       func(childComplexity int) int
-		Name     func(childComplexity int) int
-		Points   func(childComplexity int) int
-		SlugOrID func(childComplexity int) int
-		Type     func(childComplexity int) int
-		Versions func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Name            func(childComplexity int) int
+		OptimizedPoints func(childComplexity int) int
+		Points          func(childComplexity int) int
+		SlugOrID        func(childComplexity int) int
+		Type            func(childComplexity int) int
+		Versions        func(childComplexity int) int
 	}
 
 	TrackListResult struct {
@@ -197,6 +198,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Track.Name(childComplexity), true
+	case "Track.optimizedPoints":
+		if e.ComplexityRoot.Track.OptimizedPoints == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Track.OptimizedPoints(childComplexity), true
 	case "Track.points":
 		if e.ComplexityRoot.Track.Points == nil {
 			break
@@ -368,6 +375,7 @@ type Track {
   points: [Point!]
   type: Int
   versions: [TrackVersion!]
+  optimizedPoints: [Point!]
 }
 
 type TrackVersion {
@@ -430,6 +438,8 @@ func (ec *executionContext) childFields_Track(ctx context.Context, field graphql
 		return ec.fieldContext_Track_type(ctx, field)
 	case "versions":
 		return ec.fieldContext_Track_versions(ctx, field)
+	case "optimizedPoints":
+		return ec.fieldContext_Track_optimizedPoints(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Track", field.Name)
 }
@@ -1224,6 +1234,38 @@ func (ec *executionContext) fieldContext_Track_versions(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return ec.childFields_TrackVersion(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Track_optimizedPoints(ctx context.Context, field graphql.CollectedField, obj *model.Track) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Track_optimizedPoints(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.OptimizedPoints, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Point) graphql.Marshaler {
+			return ec.marshalOPoint2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPointᚄ(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Track_optimizedPoints(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Track",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Point(ctx, field)
 		},
 	}
 	return fc, nil
@@ -2669,6 +2711,11 @@ func (ec *executionContext) _Track(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "versions":
 			out.Values[i] = ec._Track_versions(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
+		case "optimizedPoints":
+			out.Values[i] = ec._Track_optimizedPoints(ctx, field, obj)
 			if out.Values[i] == graphql.RequiredNull {
 				out.Invalids++
 			}
