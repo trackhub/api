@@ -375,7 +375,7 @@ type Track {
   points: [Point!]
   type: Int
   versions: [TrackVersion!]
-  optimizedPoints: [Point!]
+  optimizedPoints: [[Point!]]
 }
 
 type TrackVersion {
@@ -1251,8 +1251,8 @@ func (ec *executionContext) _Track_optimizedPoints(ctx context.Context, field gr
 			return obj.OptimizedPoints, nil
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v []*model.Point) graphql.Marshaler {
-			return ec.marshalOPoint2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPointᚄ(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v [][]*model.Point) graphql.Marshaler {
+			return ec.marshalOPoint2ᚕᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPoint(ctx, selections, v)
 		},
 		true,
 		false,
@@ -3605,6 +3605,19 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	_ = ctx
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOPoint2ᚕᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPoint(ctx context.Context, sel ast.SelectionSet, v [][]*model.Point) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalOPoint2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPointᚄ(ctx, sel, v[i])
+	})
+
+	return ret
 }
 
 func (ec *executionContext) marshalOPoint2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPointᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Point) graphql.Marshaler {

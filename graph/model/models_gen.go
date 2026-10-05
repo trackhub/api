@@ -27,7 +27,7 @@ type Track struct {
 	Points          []*Point        `json:"points,omitempty"`
 	Type            *int            `json:"type,omitempty"`
 	Versions        []*TrackVersion `json:"versions,omitempty"`
-	OptimizedPoints []*Point        `json:"optimizedPoints,omitempty"`
+	OptimizedPoints [][]*Point      `json:"optimizedPoints,omitempty"`
 }
 
 type TrackListResult struct {
