@@ -111,12 +111,18 @@ func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neL
 			break
 		}
 
+		var icon *string
+		calculatedIcon, err := r.PlaceImageDetector().DetectImage(int(gormPlace.Type))
+		if err == nil {
+			icon = &calculatedIcon
+		}
+
 		place := &model.Place{
 			ID:         gormPlace.ID,
 			SlugOrID:   gormPlace.SlugOrId(),
 			Name:       &gormPlace.NameEn, // @TODO localize
 			Attraction: gormPlace.IsAttraction,
-			Icon:       nil, // @TOOD
+			Icon:       icon,
 			Lat:        gormPlace.Lat,
 			Lng:        gormPlace.Lng,
 		}

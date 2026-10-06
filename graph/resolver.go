@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm/logger"
 
 	"github.com/trackhub/api/gorm/repository"
+	placeService "github.com/trackhub/api/service/place"
 )
 
 type Resolver struct {
@@ -24,6 +25,10 @@ func (r Resolver) TrackRepository() *repository.TrackRepository {
 
 func (r Resolver) PlaceRepository() *repository.PlaceRepository {
 	return repository.NewPlaceRepository(r.DB)
+}
+
+func (r Resolver) PlaceImageDetector() placeService.ImageDetector {
+	return placeService.ImageDetector{}
 }
 
 func InitDB(user string, pass string, database string, host string) *gorm.DB {
