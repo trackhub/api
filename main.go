@@ -51,21 +51,11 @@ func main() {
 
 	r := gin.Default()
 
-	r.Use(cors.Default())
-
-	hf := func(ctx *gin.Context) {
-		auth := ctx.Request.Header.Get("auth")
-		if auth != "test123" {
-			// ctx.JSON(500, map[string]string{"test123": "da"})
-			// do ctx.Abort() to cancel the request
-			return
-		}
-
-		ctx.Next()
-	}
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	r.Use(cors.New(corsConfig))
 
 	g := r.Group("/")
-	g.Use(hf)
 
 	g.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
