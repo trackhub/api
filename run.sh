@@ -16,8 +16,8 @@ docker build --tag=trackhub-api-web ./docker/web/
 docker compose -p track build
 
 if [[ "$1" == "prod" ]]; then
-  docker compose -p track -f docker-compose.yml build
-  docker compose -p track -f docker-compose.yml up
+  docker compose -p track -f docker-compose.yml -f docker-compose-prod.yml build
+  docker compose -p track -f docker-compose.yml -f docker-compose-prod.yml up
 else
   if [[ "$1" == "dev" ]]; then
     docker compose -p track -f docker-compose.yml -f docker-compose-dev.yml build
