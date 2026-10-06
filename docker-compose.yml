@@ -3,7 +3,7 @@ version: "3"
 services:
   th-gql-web:
     restart: unless-stopped
-    build: docker/web/dev
+    build: docker/web/prod
     volumes:
       - ./:/app
     environment:

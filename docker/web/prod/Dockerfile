@@ -1,4 +1,3 @@
 FROM trackhub-api-web
 
-# @TODO
-RUN exit 1
+CMD go build main.go && ./main
