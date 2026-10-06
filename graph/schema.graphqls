@@ -15,21 +15,30 @@ type Point {
 type Query {
   listTracks(
     skipTracks: [String!]
-  ): [Track!]!
+    neLat: Float!
+    swLat: Float!
+    neLon: Float!
+    swLon: Float!
+
+  ): TrackListResult!
 
   listPlaces(
     skipPlaces: [String!]
-  ): [Place!]!
+    neLat: Float!
+    swLat: Float!
+    neLon: Float!
+    swLon: Float!
+  ): PlaceListResult!
 }
 
 type Place {
-  attraction: Boolean
+  attraction: Boolean!
   id: String!
   slugOrId: String!
   name: String
   icon: String
-  lat: Float
-  lng: Float
+  lat: Float!
+  lng: Float!
 }
 
 type Track {
@@ -38,4 +47,20 @@ type Track {
   slugOrId: String!
   points: [Point!]
   type: Int
+  versions: [TrackVersion!]
+  optimizedPoints: [[Point!]]
+}
+
+type TrackVersion {
+  id: String!
+}
+
+type PlaceListResult {
+  places: [Place!]!
+  status: Int!
+}
+
+type TrackListResult {
+  tracks: [Track]!
+  status: Int!
 }

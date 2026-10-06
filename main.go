@@ -5,6 +5,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
@@ -20,7 +21,12 @@ func graphqlHandler() gin.HandlerFunc {
 		generated.NewExecutableSchema(
 			generated.Config{
 				Resolvers: &graph.Resolver{
-					DB: graph.InitDB(),
+					DB: graph.InitDB(
+						os.Getenv("SQL_USER"),
+						os.Getenv("SQL_PASS"),
+						os.Getenv("SQL_DATABASE"),
+						os.Getenv("SQL_HOST"),
+					),
 				},
 			},
 		),
@@ -44,6 +50,8 @@ func main() {
 	godotenv.Load()
 
 	r := gin.Default()
+
+	r.Use(cors.Default())
 
 	hf := func(ctx *gin.Context) {
 		auth := ctx.Request.Header.Get("auth")
