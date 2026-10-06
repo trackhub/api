@@ -1,4 +1,5 @@
 FROM trackhub-api-web
 
-# @TODO
-RUN exit 1
+ENV GIN_MODE=release
+
+CMD go build main.go && ./main
