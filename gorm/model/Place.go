@@ -1,5 +1,9 @@
 package model
 
+const PLACE_TYPE_GENERIC = 0
+const PLACE_TYPE_DRINKING_FOUNTAIN = 1
+const PLACE_TYPE_RESTAURANT = 2
+
 type Place struct {
 	ID           string `gorm:"type:uuid;primaryKey"`
 	NameEn       string
