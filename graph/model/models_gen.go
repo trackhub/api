@@ -30,7 +30,7 @@ type Track struct {
 	Name            *string         `json:"name,omitempty"`
 	SlugOrID        string          `json:"slugOrId"`
 	Points          []*Point        `json:"points,omitempty"`
-	Type            *int            `json:"type,omitempty"`
+	Type            int             `json:"type"`
 	Versions        []*TrackVersion `json:"versions,omitempty"`
 	OptimizedPoints [][]*Point      `json:"optimizedPoints,omitempty"`
 }

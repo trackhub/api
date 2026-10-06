@@ -22,6 +22,8 @@ type Query {
 
   ): TrackListResult!
 
+  latestTracks(type: Int!): [Track!]!
+
   listPlaces(
     skipPlaces: [String!]
     neLat: Float!
@@ -46,7 +48,7 @@ type Track {
   name: String
   slugOrId: String!
   points: [Point!]
-  type: Int
+  type: Int!
   versions: [TrackVersion!]
   optimizedPoints: [[Point!]]
 }

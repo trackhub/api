@@ -56,8 +56,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		ListPlaces func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
-		ListTracks func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) int
+		LatestTracks func(childComplexity int, typeArg int) int
+		ListPlaces   func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
+		ListTracks   func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) int
 	}
 
 	Track struct {
@@ -91,6 +92,7 @@ type ComplexityRoot struct {
 
 type QueryResolver interface {
 	ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error)
+	LatestTracks(ctx context.Context, typeArg int) ([]*model.Track, error)
 	ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error)
 }
 
@@ -181,6 +183,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.Point.Lng(childComplexity), true
 
+	case "Query.latestTracks":
+		if e.ComplexityRoot.Query.LatestTracks == nil {
+			break
+		}
+
+		args, err := ec.field_Query_latestTracks_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.LatestTracks(childComplexity, args["type"].(int)), true
 	case "Query.listPlaces":
 		if e.ComplexityRoot.Query.ListPlaces == nil {
 			break
@@ -371,6 +384,8 @@ type Query {
 
   ): TrackListResult!
 
+  latestTracks(type: Int!): [Track!]!
+
   listPlaces(
     skipPlaces: [String!]
     neLat: Float!
@@ -395,7 +410,7 @@ type Track {
   name: String
   slugOrId: String!
   points: [Point!]
-  type: Int
+  type: Int!
   versions: [TrackVersion!]
   optimizedPoints: [[Point!]]
 }
@@ -626,6 +641,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_latestTracks_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "type",
+		func(ctx context.Context, v any) (int, error) {
+			return ec.unmarshalNInt2int(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["type"] = arg0
 	return args, nil
 }
 
@@ -1087,6 +1116,50 @@ func (ec *executionContext) fieldContext_Query_listTracks(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_latestTracks(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_latestTracks(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().LatestTracks(ctx, fc.Args["type"].(int))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Track) graphql.Marshaler {
+			return ec.marshalNTrack2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_latestTracks(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Track(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_latestTracks_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_listPlaces(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1320,11 +1393,11 @@ func (ec *executionContext) _Track_type(ctx context.Context, field graphql.Colle
 			return obj.Type, nil
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *int) graphql.Marshaler {
-			return ec.marshalOInt2ᚖint(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v int) graphql.Marshaler {
+			return ec.marshalNInt2int(ctx, selections, v)
 		},
 		true,
-		false,
+		true,
 	)
 }
 func (ec *executionContext) fieldContext_Track_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2782,6 +2855,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "latestTracks":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_latestTracks(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "listPlaces":
 			field := field
 
@@ -2873,7 +2968,7 @@ func (ec *executionContext) _Track(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "type":
 			out.Values[i] = ec._Track_type(ctx, field, obj)
-			if out.Values[i] == graphql.RequiredNull {
+			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "versions":
@@ -3559,6 +3654,32 @@ func (ec *executionContext) marshalNTrack2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋ
 	return ret
 }
 
+func (ec *executionContext) marshalNTrack2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Track) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNTrack2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrack(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTrack2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrack(ctx context.Context, sel ast.SelectionSet, v *model.Track) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Track(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNTrackListResult2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackListResult(ctx context.Context, sel ast.SelectionSet, v *model.TrackListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -3746,24 +3867,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = sel
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	_ = sel
-	_ = ctx
-	res := graphql.MarshalInt(*v)
 	return res
 }
 
