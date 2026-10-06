@@ -3,13 +3,18 @@
 package model
 
 type Place struct {
-	Attraction *bool    `json:"attraction,omitempty"`
-	ID         string   `json:"id"`
-	SlugOrID   string   `json:"slugOrId"`
-	Name       *string  `json:"name,omitempty"`
-	Icon       *string  `json:"icon,omitempty"`
-	Lat        *float64 `json:"lat,omitempty"`
-	Lng        *float64 `json:"lng,omitempty"`
+	Attraction bool    `json:"attraction"`
+	ID         string  `json:"id"`
+	SlugOrID   string  `json:"slugOrId"`
+	Name       *string `json:"name,omitempty"`
+	Icon       *string `json:"icon,omitempty"`
+	Lat        float64 `json:"lat"`
+	Lng        float64 `json:"lng"`
+}
+
+type PlaceListResult struct {
+	Places []*Place `json:"places"`
+	Status int      `json:"status"`
 }
 
 type Point struct {

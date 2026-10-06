@@ -8,7 +8,6 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/trackhub/api/graph/generated"
@@ -19,12 +18,14 @@ import (
 func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error) {
 	result := &model.TrackListResult{}
 
-	tracks := make([]*model.Track, 0, 10)
+	const queryLimit = 10
+
+	tracks := make([]*model.Track, 0, queryLimit)
 
 	gormTracks, err := r.TrackRepository().FindAllPublicNotInId(
 		ctx,
 		skipTracks,
-		11,
+		queryLimit+1,
 		neLat,
 		swLat,
 		neLon,
@@ -39,8 +40,8 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 	trackCount := 0
 	for _, gormTrack := range gormTracks {
 		trackCount += 1
-		if trackCount > 10 {
-			result.Status = 1
+		if trackCount > queryLimit {
+			result.Status = 2
 			break
 		}
 
@@ -80,8 +81,55 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 }
 
 // ListPlaces is the resolver for the listPlaces field.
-func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string) ([]*model.Place, error) {
-	panic(fmt.Errorf("not implemented: ListPlaces - listPlaces"))
+func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error) {
+	result := &model.PlaceListResult{}
+
+	const queryLimit = 100
+
+	places := make([]*model.Place, 0, queryLimit)
+
+	gormPlaces, err := r.PlaceRepository().FindAllPublicNotInId(
+		ctx,
+		skipPlaces,
+		queryLimit+1,
+		neLat,
+		swLat,
+		neLon,
+		swLon,
+	)
+
+	if err != nil {
+		log.Println("Unalbe to fetch places", err)
+		return nil, errors.New("Unable to fetch -places")
+	}
+
+	placesCount := 0
+	for _, gormPlace := range gormPlaces {
+		placesCount += 1
+		if placesCount > queryLimit {
+			result.Status = 2
+			break
+		}
+
+		place := &model.Place{
+			ID:         gormPlace.ID,
+			SlugOrID:   gormPlace.SlugOrId(),
+			Name:       &gormPlace.NameEn, // @TODO localize
+			Attraction: gormPlace.IsAttraction,
+			Icon:       nil, // @TOOD
+			Lat:        gormPlace.Lat,
+			Lng:        gormPlace.Lng,
+		}
+
+		places = append(
+			places,
+			place,
+		)
+	}
+
+	result.Places = places
+
+	return result, nil
 }
 
 // Query returns generated.QueryResolver implementation.

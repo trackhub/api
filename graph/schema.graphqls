@@ -24,17 +24,21 @@ type Query {
 
   listPlaces(
     skipPlaces: [String!]
-  ): [Place!]!
+    neLat: Float!
+    swLat: Float!
+    neLon: Float!
+    swLon: Float!
+  ): PlaceListResult!
 }
 
 type Place {
-  attraction: Boolean
+  attraction: Boolean!
   id: String!
   slugOrId: String!
   name: String
   icon: String
-  lat: Float
-  lng: Float
+  lat: Float!
+  lng: Float!
 }
 
 type Track {
@@ -49,6 +53,11 @@ type Track {
 
 type TrackVersion {
   id: String!
+}
+
+type PlaceListResult {
+  places: [Place!]!
+  status: Int!
 }
 
 type TrackListResult {
