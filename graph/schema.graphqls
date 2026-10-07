@@ -2,6 +2,11 @@
 #
 # https://gqlgen.com/getting-started/
 
+enum Locale {
+  en
+  bg
+}
+
 type User {
   id: ID!
   name: String!
@@ -21,6 +26,8 @@ type Query {
     swLon: Float!
 
   ): TrackListResult!
+
+  latestTracks(type: Int!, locale: Locale): [Track!]!
 
   listPlaces(
     skipPlaces: [String!]
@@ -46,7 +53,7 @@ type Track {
   name: String
   slugOrId: String!
   points: [Point!]
-  type: Int
+  type: Int!
   versions: [TrackVersion!]
   optimizedPoints: [[Point!]]
 }

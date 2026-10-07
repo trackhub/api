@@ -12,6 +12,7 @@ import (
 
 	"github.com/trackhub/api/graph/generated"
 	"github.com/trackhub/api/graph/model"
+	localeService "github.com/trackhub/api/service/locale"
 )
 
 // ListTracks is the resolver for the listTracks field.
@@ -48,7 +49,7 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 		track := &model.Track{
 			ID:       gormTrack.ID,
 			SlugOrID: gormTrack.SlugOrId(),
-			Type:     &gormTrack.Type,
+			Type:     gormTrack.Type,
 			Versions: make([]*model.TrackVersion, 0),
 		}
 
@@ -80,6 +81,44 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 	return result, nil
 }
 
+// LatestTracks is the resolver for the latestTracks field.
+func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error) {
+	tracks := make([]*model.Track, 0, 10)
+
+	gormTracks, err := r.TrackRepository().FindLatest(context.TODO(), typeArg, 10)
+	if err != nil {
+		log.Println("Unable to fetch latest tracks", err)
+		return nil, errors.New("Unable to fetch tracks")
+	}
+
+	for _, gormTrack := range gormTracks {
+		track := &model.Track{
+			ID:       gormTrack.ID,
+			SlugOrID: gormTrack.SlugOrId(),
+			Name:     localeService.TrackName(gormTrack, locale),
+			Type:     gormTrack.Type,
+		}
+
+		optimizedPoints := make([]*model.Point, 0)
+		for _, optimizedPoint := range gormTrack.OptimizedPoints {
+			optimizedPoints = append(optimizedPoints, &model.Point{
+				Lat: optimizedPoint.Lat,
+				Lng: optimizedPoint.Lng,
+			})
+
+			track.OptimizedPoints = make([][]*model.Point, 0)
+			track.OptimizedPoints = append(track.OptimizedPoints, optimizedPoints)
+		}
+
+		tracks = append(
+			tracks,
+			track,
+		)
+	}
+
+	return tracks, nil
+}
+
 // ListPlaces is the resolver for the listPlaces field.
 func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error) {
 	result := &model.PlaceListResult{}
@@ -100,7 +139,7 @@ func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neL
 
 	if err != nil {
 		log.Println("Unalbe to fetch places", err)
-		return nil, errors.New("Unable to fetch -places")
+		return nil, errors.New("Unable to fetch places")
 	}
 
 	placesCount := 0

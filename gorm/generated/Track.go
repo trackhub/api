@@ -9,14 +9,16 @@ import (
 
 var Track = struct {
 	ID              field.String
-	Name            field.String
+	NameEn          field.String
+	NameBg          field.String
 	Slug            field.String
 	Type            field.Number[int]
 	TrackVersions   field.Slice[model.TrackVersion]
 	OptimizedPoints field.Slice[model.OptimizedPoint]
 }{
 	ID:              field.String{}.WithColumn("id"),
-	Name:            field.String{}.WithColumn("name"),
+	NameEn:          field.String{}.WithColumn("name_en"),
+	NameBg:          field.String{}.WithColumn("name_bg"),
 	Slug:            field.String{}.WithColumn("slug"),
 	Type:            field.Number[int]{}.WithColumn("type"),
 	TrackVersions:   field.Slice[model.TrackVersion]{}.WithName("TrackVersions"),
