@@ -18,6 +18,8 @@ type Point {
 }
 
 type Query {
+  track(idOrSlug: String!): Track!
+
   listTracks(
     skipTracks: [String!]
     neLat: Float!

@@ -8,12 +8,24 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/trackhub/api/graph/generated"
 	"github.com/trackhub/api/graph/model"
-	localeService "github.com/trackhub/api/service/locale"
+	"github.com/trackhub/api/service/mapper"
 )
+
+// Track is the resolver for the track field.
+func (r *queryResolver) Track(ctx context.Context, idOrSlug string) (*model.Track, error) {
+	gormTrack, err := r.TrackRepository().GetBySlugOrId(context.TODO(), idOrSlug)
+	if err != nil {
+		fmt.Println("Error during getting track with id "+idOrSlug+": ", err.Error())
+		return nil, errors.New("unable to find the track")
+	}
+
+	return mapper.GormTrackToGraphTrack(*gormTrack), nil
+}
 
 // ListTracks is the resolver for the listTracks field.
 func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error) {
@@ -46,33 +58,9 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 			break
 		}
 
-		track := &model.Track{
-			ID:       gormTrack.ID,
-			SlugOrID: gormTrack.SlugOrId(),
-			Type:     gormTrack.Type,
-			Versions: make([]*model.TrackVersion, 0),
-		}
-
-		for _, trackVersion := range gormTrack.TrackVersions {
-			track.Versions = append(track.Versions, &model.TrackVersion{
-				ID: trackVersion.ID,
-			})
-		}
-
-		optimizedPoints := make([]*model.Point, 0)
-		for _, optimizedPoint := range gormTrack.OptimizedPoints {
-			optimizedPoints = append(optimizedPoints, &model.Point{
-				Lat: optimizedPoint.Lat,
-				Lng: optimizedPoint.Lng,
-			})
-
-			track.OptimizedPoints = make([][]*model.Point, 0)
-			track.OptimizedPoints = append(track.OptimizedPoints, optimizedPoints)
-		}
-
 		tracks = append(
 			tracks,
-			track,
+			mapper.GormTrackToGraphTrack(gormTrack),
 		)
 	}
 
@@ -92,27 +80,9 @@ func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int, locale *m
 	}
 
 	for _, gormTrack := range gormTracks {
-		track := &model.Track{
-			ID:       gormTrack.ID,
-			SlugOrID: gormTrack.SlugOrId(),
-			Name:     localeService.TrackName(gormTrack, locale),
-			Type:     gormTrack.Type,
-		}
-
-		optimizedPoints := make([]*model.Point, 0)
-		for _, optimizedPoint := range gormTrack.OptimizedPoints {
-			optimizedPoints = append(optimizedPoints, &model.Point{
-				Lat: optimizedPoint.Lat,
-				Lng: optimizedPoint.Lng,
-			})
-
-			track.OptimizedPoints = make([][]*model.Point, 0)
-			track.OptimizedPoints = append(track.OptimizedPoints, optimizedPoints)
-		}
-
 		tracks = append(
 			tracks,
-			track,
+			mapper.GormTrackToGraphTrack(gormTrack),
 		)
 	}
 

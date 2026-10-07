@@ -59,6 +59,7 @@ type ComplexityRoot struct {
 		LatestTracks func(childComplexity int, typeArg int, locale *model.Locale) int
 		ListPlaces   func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
 		ListTracks   func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) int
+		Track        func(childComplexity int, idOrSlug string) int
 	}
 
 	Track struct {
@@ -91,6 +92,7 @@ type ComplexityRoot struct {
 // region    ************************** generated!.gotpl **************************
 
 type QueryResolver interface {
+	Track(ctx context.Context, idOrSlug string) (*model.Track, error)
 	ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error)
 	LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error)
 	ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error)
@@ -216,6 +218,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.ListTracks(childComplexity, args["skipTracks"].([]string), args["neLat"].(float64), args["swLat"].(float64), args["neLon"].(float64), args["swLon"].(float64)), true
+	case "Query.track":
+		if e.ComplexityRoot.Query.Track == nil {
+			break
+		}
+
+		args, err := ec.field_Query_track_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.Track(childComplexity, args["idOrSlug"].(string)), true
 
 	case "Track.id":
 		if e.ComplexityRoot.Track.ID == nil {
@@ -380,6 +393,8 @@ type Point {
 }
 
 type Query {
+  track(idOrSlug: String!): Track!
+
   listTracks(
     skipTracks: [String!]
     neLat: Float!
@@ -763,6 +778,20 @@ func (ec *executionContext) field_Query_listTracks_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_track_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "idOrSlug",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["idOrSlug"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1083,6 +1112,50 @@ func (ec *executionContext) _Point_lng(ctx context.Context, field graphql.Collec
 }
 func (ec *executionContext) fieldContext_Point_lng(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Point", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _Query_track(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_track(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().Track(ctx, fc.Args["idOrSlug"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.Track) graphql.Marshaler {
+			return ec.marshalNTrack2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrack(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_track(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Track(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_track_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
 }
 
 func (ec *executionContext) _Query_listTracks(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2846,6 +2919,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "track":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_track(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "listTracks":
 			field := field
 
