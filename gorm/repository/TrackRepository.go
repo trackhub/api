@@ -47,6 +47,7 @@ func (r *TrackRepository) FindLatest(ctx context.Context, trackType, limit int) 
 	q := r.generateQuery(ctx).
 		Where("visibility = ?", gormModel.VisibilityPublic).
 		Where("type = ?", trackType).
+		Order("created_at DESC").
 		Limit(limit)
 
 	tx := q.Find(&tracks)
