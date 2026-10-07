@@ -56,7 +56,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		LatestTracks func(childComplexity int, typeArg int) int
+		LatestTracks func(childComplexity int, typeArg int, locale *model.Locale) int
 		ListPlaces   func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
 		ListTracks   func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) int
 	}
@@ -92,7 +92,7 @@ type ComplexityRoot struct {
 
 type QueryResolver interface {
 	ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error)
-	LatestTracks(ctx context.Context, typeArg int) ([]*model.Track, error)
+	LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error)
 	ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error)
 }
 
@@ -193,7 +193,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.LatestTracks(childComplexity, args["type"].(int)), true
+		return e.ComplexityRoot.Query.LatestTracks(childComplexity, args["type"].(int), args["locale"].(*model.Locale)), true
 	case "Query.listPlaces":
 		if e.ComplexityRoot.Query.ListPlaces == nil {
 			break
@@ -364,6 +364,11 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
+enum Locale {
+  en
+  bg
+}
+
 type User {
   id: ID!
   name: String!
@@ -384,7 +389,7 @@ type Query {
 
   ): TrackListResult!
 
-  latestTracks(type: Int!): [Track!]!
+  latestTracks(type: Int!, locale: Locale): [Track!]!
 
   listPlaces(
     skipPlaces: [String!]
@@ -655,6 +660,14 @@ func (ec *executionContext) field_Query_latestTracks_args(ctx context.Context, r
 		return nil, err
 	}
 	args["type"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "locale",
+		func(ctx context.Context, v any) (*model.Locale, error) {
+			return ec.unmarshalOLocale2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐLocale(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["locale"] = arg1
 	return args, nil
 }
 
@@ -1126,7 +1139,7 @@ func (ec *executionContext) _Query_latestTracks(ctx context.Context, field graph
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().LatestTracks(ctx, fc.Args["type"].(int))
+			return ec.Resolvers.Query().LatestTracks(ctx, fc.Args["type"].(int), fc.Args["locale"].(*model.Locale))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v []*model.Track) graphql.Marshaler {
@@ -3868,6 +3881,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOLocale2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐLocale(ctx context.Context, v any) (*model.Locale, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.Locale)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOLocale2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐLocale(ctx context.Context, sel ast.SelectionSet, v *model.Locale) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOPoint2ᚕᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPoint(ctx context.Context, sel ast.SelectionSet, v [][]*model.Point) graphql.Marshaler {

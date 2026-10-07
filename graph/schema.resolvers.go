@@ -12,6 +12,7 @@ import (
 
 	"github.com/trackhub/api/graph/generated"
 	"github.com/trackhub/api/graph/model"
+	localeService "github.com/trackhub/api/service/locale"
 )
 
 // ListTracks is the resolver for the listTracks field.
@@ -81,7 +82,7 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 }
 
 // LatestTracks is the resolver for the latestTracks field.
-func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int) ([]*model.Track, error) {
+func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error) {
 	tracks := make([]*model.Track, 0, 10)
 
 	gormTracks, err := r.TrackRepository().FindLatest(context.TODO(), typeArg, 10)
@@ -94,6 +95,7 @@ func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int) ([]*model
 		track := &model.Track{
 			ID:       gormTrack.ID,
 			SlugOrID: gormTrack.SlugOrId(),
+			Name:     localeService.TrackName(gormTrack, locale),
 			Type:     gormTrack.Type,
 		}
 

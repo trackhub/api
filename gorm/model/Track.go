@@ -4,7 +4,8 @@ const VisibilityPublic = 0
 
 type Track struct {
 	ID              string `gorm:"type:uuid;primaryKey"`
-	Name            string
+	NameEn          *string
+	NameBg          *string
 	Slug            *string
 	Type            int
 	TrackVersions   []TrackVersion   `gorm:"foreignKey:TrackId"`

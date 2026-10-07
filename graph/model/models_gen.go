@@ -2,6 +2,13 @@
 
 package model
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Place struct {
 	Attraction bool    `json:"attraction"`
 	ID         string  `json:"id"`
@@ -47,4 +54,59 @@ type TrackVersion struct {
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type Locale string
+
+const (
+	LocaleEn Locale = "en"
+	LocaleBg Locale = "bg"
+)
+
+var AllLocale = []Locale{
+	LocaleEn,
+	LocaleBg,
+}
+
+func (e Locale) IsValid() bool {
+	switch e {
+	case LocaleEn, LocaleBg:
+		return true
+	}
+	return false
+}
+
+func (e Locale) String() string {
+	return string(e)
+}
+
+func (e *Locale) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Locale(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Locale", str)
+	}
+	return nil
+}
+
+func (e Locale) MarshalGQL(w io.Writer) {
+	_, _ = fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *Locale) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e Locale) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }
