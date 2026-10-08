@@ -18,13 +18,15 @@ type Point {
 }
 
 type Query {
+  track(idOrSlug: String!, locale: Locale): Track!
+
   listTracks(
     skipTracks: [String!]
     neLat: Float!
     swLat: Float!
     neLon: Float!
     swLon: Float!
-
+    locale: Locale
   ): TrackListResult!
 
   latestTracks(type: Int!, locale: Locale): [Track!]!

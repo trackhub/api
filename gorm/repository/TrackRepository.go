@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	gormModel "github.com/trackhub/api/gorm/model"
 	"gorm.io/gorm"
@@ -20,6 +21,31 @@ func (r *TrackRepository) generateQuery(ctx context.Context) *gorm.DB {
 		Model(&gormModel.Track{}).
 		Preload("TrackVersions").
 		Preload("OptimizedPoints")
+}
+
+func (r *TrackRepository) GetBySlugOrId(ctx context.Context, id string) (*gormModel.Track, error) {
+	var tracks []gormModel.Track
+
+	tx := r.generateQuery(ctx).
+		Where("id = ? or slug = ?", id, id).
+		Limit(2).
+		Find(&tracks)
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	if len(tracks) == 1 {
+		return &tracks[0], nil
+	}
+
+	for _, track := range tracks {
+		if track.ID == id {
+			return &track, nil
+		}
+	}
+
+	return nil, errors.New("track " + id + " not found")
 }
 
 func (r *TrackRepository) FindAllPublicNotInId(ctx context.Context, ids []string, limit int, neLat, swLat, neLon, swLon float64) ([]gormModel.Track, error) {
