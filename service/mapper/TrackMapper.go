@@ -4,12 +4,14 @@ import (
 	gormModel "github.com/trackhub/api/gorm/model"
 	"github.com/trackhub/api/graph/model"
 	graphModel "github.com/trackhub/api/graph/model"
+	localeService "github.com/trackhub/api/service/locale"
 )
 
-func GormTrackToGraphTrack(t gormModel.Track) *graphModel.Track {
+func GormTrackToGraphTrack(t gormModel.Track, locale *model.Locale) *graphModel.Track {
 	track := &graphModel.Track{
 		ID:       t.ID,
 		SlugOrID: t.SlugOrId(),
+		Name:     localeService.TrackName(t, locale),
 		Type:     t.Type,
 		Versions: make([]*graphModel.TrackVersion, 0),
 	}

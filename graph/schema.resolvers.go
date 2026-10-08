@@ -18,17 +18,17 @@ import (
 
 // Track is the resolver for the track field.
 func (r *queryResolver) Track(ctx context.Context, idOrSlug string) (*model.Track, error) {
-	gormTrack, err := r.TrackRepository().GetBySlugOrId(context.TODO(), idOrSlug)
+	gormTrack, err := r.TrackRepository().GetBySlugOrId(ctx, idOrSlug)
 	if err != nil {
 		fmt.Println("Error during getting track with id "+idOrSlug+": ", err.Error())
 		return nil, errors.New("unable to find the track")
 	}
 
-	return mapper.GormTrackToGraphTrack(*gormTrack), nil
+	return mapper.GormTrackToGraphTrack(*gormTrack, nil), nil
 }
 
 // ListTracks is the resolver for the listTracks field.
-func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.TrackListResult, error) {
+func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) (*model.TrackListResult, error) {
 	result := &model.TrackListResult{}
 
 	const queryLimit = 10
@@ -60,7 +60,7 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 
 		tracks = append(
 			tracks,
-			mapper.GormTrackToGraphTrack(gormTrack),
+			mapper.GormTrackToGraphTrack(gormTrack, locale),
 		)
 	}
 
@@ -73,7 +73,7 @@ func (r *queryResolver) ListTracks(ctx context.Context, skipTracks []string, neL
 func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error) {
 	tracks := make([]*model.Track, 0, 10)
 
-	gormTracks, err := r.TrackRepository().FindLatest(context.TODO(), typeArg, 10)
+	gormTracks, err := r.TrackRepository().FindLatest(ctx, typeArg, 10)
 	if err != nil {
 		log.Println("Unable to fetch latest tracks", err)
 		return nil, errors.New("Unable to fetch tracks")
@@ -82,7 +82,7 @@ func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int, locale *m
 	for _, gormTrack := range gormTracks {
 		tracks = append(
 			tracks,
-			mapper.GormTrackToGraphTrack(gormTrack),
+			mapper.GormTrackToGraphTrack(gormTrack, locale),
 		)
 	}
 
