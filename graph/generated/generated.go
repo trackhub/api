@@ -59,7 +59,7 @@ type ComplexityRoot struct {
 		LatestTracks func(childComplexity int, typeArg int, locale *model.Locale) int
 		ListPlaces   func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
 		ListTracks   func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) int
-		Track        func(childComplexity int, idOrSlug string) int
+		Track        func(childComplexity int, idOrSlug string, locale *model.Locale) int
 	}
 
 	Track struct {
@@ -92,7 +92,7 @@ type ComplexityRoot struct {
 // region    ************************** generated!.gotpl **************************
 
 type QueryResolver interface {
-	Track(ctx context.Context, idOrSlug string) (*model.Track, error)
+	Track(ctx context.Context, idOrSlug string, locale *model.Locale) (*model.Track, error)
 	ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) (*model.TrackListResult, error)
 	LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error)
 	ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error)
@@ -228,7 +228,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.Track(childComplexity, args["idOrSlug"].(string)), true
+		return e.ComplexityRoot.Query.Track(childComplexity, args["idOrSlug"].(string), args["locale"].(*model.Locale)), true
 
 	case "Track.id":
 		if e.ComplexityRoot.Track.ID == nil {
@@ -393,7 +393,7 @@ type Point {
 }
 
 type Query {
-  track(idOrSlug: String!): Track!
+  track(idOrSlug: String!, locale: Locale): Track!
 
   listTracks(
     skipTracks: [String!]
@@ -797,6 +797,14 @@ func (ec *executionContext) field_Query_track_args(ctx context.Context, rawArgs 
 		return nil, err
 	}
 	args["idOrSlug"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "locale",
+		func(ctx context.Context, v any) (*model.Locale, error) {
+			return ec.unmarshalOLocale2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐLocale(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["locale"] = arg1
 	return args, nil
 }
 
@@ -1132,7 +1140,7 @@ func (ec *executionContext) _Query_track(ctx context.Context, field graphql.Coll
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().Track(ctx, fc.Args["idOrSlug"].(string))
+			return ec.Resolvers.Query().Track(ctx, fc.Args["idOrSlug"].(string), fc.Args["locale"].(*model.Locale))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.Track) graphql.Marshaler {

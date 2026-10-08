@@ -18,7 +18,7 @@ type Point {
 }
 
 type Query {
-  track(idOrSlug: String!): Track!
+  track(idOrSlug: String!, locale: Locale): Track!
 
   listTracks(
     skipTracks: [String!]

@@ -17,14 +17,14 @@ import (
 )
 
 // Track is the resolver for the track field.
-func (r *queryResolver) Track(ctx context.Context, idOrSlug string) (*model.Track, error) {
+func (r *queryResolver) Track(ctx context.Context, idOrSlug string, locale *model.Locale) (*model.Track, error) {
 	gormTrack, err := r.TrackRepository().GetBySlugOrId(ctx, idOrSlug)
 	if err != nil {
 		fmt.Println("Error during getting track with id "+idOrSlug+": ", err.Error())
 		return nil, errors.New("unable to find the track")
 	}
 
-	return mapper.GormTrackToGraphTrack(*gormTrack, nil), nil
+	return mapper.GormTrackToGraphTrack(*gormTrack, locale), nil
 }
 
 // ListTracks is the resolver for the listTracks field.
