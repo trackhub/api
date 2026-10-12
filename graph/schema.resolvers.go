@@ -99,12 +99,7 @@ func (r *queryResolver) LatestTrackImages(ctx context.Context) ([]*model.TrackIm
 		return nil, err
 	}
 
-	fmt.Println("test1231111")
-
 	for _, gormImage := range gormImages {
-
-		fmt.Println("test123")
-
 		images = append(images, &model.TrackImage{
 			ID:       gormImage.ID,
 			Filepath: gormImage.Filepath,
