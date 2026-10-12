@@ -9,6 +9,12 @@ import (
 	"strconv"
 )
 
+type ElevatioinPoint struct {
+	Lat       float64 `json:"lat"`
+	Lng       float64 `json:"lng"`
+	Elevation float64 `json:"elevation"`
+}
+
 type Place struct {
 	Attraction bool    `json:"attraction"`
 	ID         string  `json:"id"`
@@ -40,6 +46,12 @@ type Track struct {
 	Type            int             `json:"type"`
 	Versions        []*TrackVersion `json:"versions,omitempty"`
 	OptimizedPoints [][]*Point      `json:"optimizedPoints,omitempty"`
+}
+
+type TrackImage struct {
+	ID       string `json:"id"`
+	TrackID  string `json:"trackId"`
+	Filepath string `json:"filepath"`
 }
 
 type TrackListResult struct {

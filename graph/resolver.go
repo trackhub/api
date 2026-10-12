@@ -31,6 +31,10 @@ func (r Resolver) PlaceImageDetector() placeService.ImageDetector {
 	return placeService.ImageDetector{}
 }
 
+func (r Resolver) TrackImageRepository() *repository.TrackImageRepository {
+	return repository.NewTrackImageRepository(r.DB)
+}
+
 func InitDB(user string, pass string, database string, host string) *gorm.DB {
 	db, err := gorm.Open(
 		mysql.Open(

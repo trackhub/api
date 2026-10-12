@@ -89,6 +89,27 @@ func (r *queryResolver) LatestTracks(ctx context.Context, typeArg int, locale *m
 	return tracks, nil
 }
 
+// LatestTrackImages is the resolver for the latestTrackImages field.
+func (r *queryResolver) LatestTrackImages(ctx context.Context) ([]*model.TrackImage, error) {
+	images := make([]*model.TrackImage, 0, 10)
+
+	gormImages, err := r.TrackImageRepository().FindLatest(ctx, 10)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, gormImage := range gormImages {
+		images = append(images, &model.TrackImage{
+			ID:       gormImage.ID,
+			Filepath: gormImage.Filepath,
+			TrackID:  gormImage.TrackId,
+		})
+	}
+
+	return images, nil
+}
+
 // ListPlaces is the resolver for the listPlaces field.
 func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error) {
 	result := &model.PlaceListResult{}
