@@ -35,6 +35,12 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ElevatioinPoint struct {
+		Elevation func(childComplexity int) int
+		Lat       func(childComplexity int) int
+		Lng       func(childComplexity int) int
+	}
+
 	Place struct {
 		Attraction func(childComplexity int) int
 		ID         func(childComplexity int) int
@@ -56,10 +62,11 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		LatestTracks func(childComplexity int, typeArg int, locale *model.Locale) int
-		ListPlaces   func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
-		ListTracks   func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) int
-		Track        func(childComplexity int, idOrSlug string, locale *model.Locale) int
+		LatestTrackImages func(childComplexity int) int
+		LatestTracks      func(childComplexity int, typeArg int, locale *model.Locale) int
+		ListPlaces        func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
+		ListTracks        func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) int
+		Track             func(childComplexity int, idOrSlug string, locale *model.Locale) int
 	}
 
 	Track struct {
@@ -70,6 +77,12 @@ type ComplexityRoot struct {
 		SlugOrID        func(childComplexity int) int
 		Type            func(childComplexity int) int
 		Versions        func(childComplexity int) int
+	}
+
+	TrackImage struct {
+		Filepath func(childComplexity int) int
+		ID       func(childComplexity int) int
+		TrackID  func(childComplexity int) int
 	}
 
 	TrackListResult struct {
@@ -95,6 +108,7 @@ type QueryResolver interface {
 	Track(ctx context.Context, idOrSlug string, locale *model.Locale) (*model.Track, error)
 	ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) (*model.TrackListResult, error)
 	LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error)
+	LatestTrackImages(ctx context.Context) ([]*model.TrackImage, error)
 	ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error)
 }
 
@@ -115,6 +129,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := newExecutionContext(nil, e, nil)
 	_ = ec
 	switch typeName + "." + field {
+
+	case "ElevatioinPoint.elevation":
+		if e.ComplexityRoot.ElevatioinPoint.Elevation == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ElevatioinPoint.Elevation(childComplexity), true
+	case "ElevatioinPoint.lat":
+		if e.ComplexityRoot.ElevatioinPoint.Lat == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ElevatioinPoint.Lat(childComplexity), true
+	case "ElevatioinPoint.lng":
+		if e.ComplexityRoot.ElevatioinPoint.Lng == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ElevatioinPoint.Lng(childComplexity), true
 
 	case "Place.attraction":
 		if e.ComplexityRoot.Place.Attraction == nil {
@@ -185,6 +218,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.Point.Lng(childComplexity), true
 
+	case "Query.latestTrackImages":
+		if e.ComplexityRoot.Query.LatestTrackImages == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Query.LatestTrackImages(childComplexity), true
 	case "Query.latestTracks":
 		if e.ComplexityRoot.Query.LatestTracks == nil {
 			break
@@ -272,6 +311,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Track.Versions(childComplexity), true
+
+	case "TrackImage.filepath":
+		if e.ComplexityRoot.TrackImage.Filepath == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TrackImage.Filepath(childComplexity), true
+	case "TrackImage.id":
+		if e.ComplexityRoot.TrackImage.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TrackImage.ID(childComplexity), true
+	case "TrackImage.trackId":
+		if e.ComplexityRoot.TrackImage.TrackID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TrackImage.TrackID(childComplexity), true
 
 	case "TrackListResult.status":
 		if e.ComplexityRoot.TrackListResult.Status == nil {
@@ -392,6 +450,18 @@ type Point {
   lng: Float!
 }
 
+type ElevatioinPoint {
+  lat: Float!
+  lng: Float!
+  elevation: Float!
+}
+
+type TrackImage {
+  id: ID!
+  trackId: String!
+  filepath: String!
+}
+
 type Query {
   track(idOrSlug: String!, locale: Locale): Track!
 
@@ -405,6 +475,8 @@ type Query {
   ): TrackListResult!
 
   latestTracks(type: Int!, locale: Locale): [Track!]!
+
+  latestTrackImages: [TrackImage!]!
 
   listPlaces(
     skipPlaces: [String!]
@@ -514,6 +586,18 @@ func (ec *executionContext) childFields_Track(ctx context.Context, field graphql
 		return ec.fieldContext_Track_optimizedPoints(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Track", field.Name)
+}
+
+func (ec *executionContext) childFields_TrackImage(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "id":
+		return ec.fieldContext_TrackImage_id(ctx, field)
+	case "trackId":
+		return ec.fieldContext_TrackImage_trackId(ctx, field)
+	case "filepath":
+		return ec.fieldContext_TrackImage_filepath(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type TrackImage", field.Name)
 }
 
 func (ec *executionContext) childFields_TrackListResult(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
@@ -867,6 +951,75 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ***************************** args.gotpl *****************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _ElevatioinPoint_lat(ctx context.Context, field graphql.CollectedField, obj *model.ElevatioinPoint) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ElevatioinPoint_lat(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Lat, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v float64) graphql.Marshaler {
+			return ec.marshalNFloat2float64(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ElevatioinPoint_lat(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ElevatioinPoint", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _ElevatioinPoint_lng(ctx context.Context, field graphql.CollectedField, obj *model.ElevatioinPoint) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ElevatioinPoint_lng(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Lng, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v float64) graphql.Marshaler {
+			return ec.marshalNFloat2float64(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ElevatioinPoint_lng(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ElevatioinPoint", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _ElevatioinPoint_elevation(ctx context.Context, field graphql.CollectedField, obj *model.ElevatioinPoint) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ElevatioinPoint_elevation(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Elevation, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v float64) graphql.Marshaler {
+			return ec.marshalNFloat2float64(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ElevatioinPoint_elevation(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ElevatioinPoint", field, false, false, errors.New("field of type Float does not have child fields"))
+}
 
 func (ec *executionContext) _Place_attraction(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -1262,6 +1415,38 @@ func (ec *executionContext) fieldContext_Query_latestTracks(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_latestTrackImages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_latestTrackImages(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Query().LatestTrackImages(ctx)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.TrackImage) graphql.Marshaler {
+			return ec.marshalNTrackImage2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackImageᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_latestTrackImages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_TrackImage(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_listPlaces(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1568,6 +1753,75 @@ func (ec *executionContext) fieldContext_Track_optimizedPoints(_ context.Context
 		},
 	}
 	return fc, nil
+}
+
+func (ec *executionContext) _TrackImage_id(ctx context.Context, field graphql.CollectedField, obj *model.TrackImage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_TrackImage_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNID2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_TrackImage_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("TrackImage", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _TrackImage_trackId(ctx context.Context, field graphql.CollectedField, obj *model.TrackImage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_TrackImage_trackId(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.TrackID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_TrackImage_trackId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("TrackImage", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _TrackImage_filepath(ctx context.Context, field graphql.CollectedField, obj *model.TrackImage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_TrackImage_filepath(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Filepath, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_TrackImage_filepath(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("TrackImage", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
 func (ec *executionContext) _TrackListResult_tracks(ctx context.Context, field graphql.CollectedField, obj *model.TrackListResult) (ret graphql.Marshaler) {
@@ -2761,6 +3015,54 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** object.gotpl ****************************
 
+var elevatioinPointImplementors = []string{"ElevatioinPoint"}
+
+func (ec *executionContext) _ElevatioinPoint(ctx context.Context, sel ast.SelectionSet, obj *model.ElevatioinPoint) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, elevatioinPointImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferredFieldSet := graphql.NewFieldSet(nil)
+	deferLabelToView := make(map[string]*graphql.FieldSetView)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ElevatioinPoint")
+		case "lat":
+			out.Values[i] = ec._ElevatioinPoint_lat(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "lng":
+			out.Values[i] = ec._ElevatioinPoint_lng(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "elevation":
+			out.Values[i] = ec._ElevatioinPoint_elevation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+	ec.ProcessDeferredGroup(graphql.DeferredGroup{
+		Defers:   deferLabelToView,
+		Path:     graphql.GetPath(ctx),
+		FieldSet: deferredFieldSet,
+		Context:  ctx,
+	})
+
+	return out
+}
+
 var placeImplementors = []string{"Place"}
 
 func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, obj *model.Place) graphql.Marshaler {
@@ -3001,6 +3303,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "latestTrackImages":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_latestTrackImages(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "listPlaces":
 			field := field
 
@@ -3103,6 +3427,54 @@ func (ec *executionContext) _Track(ctx context.Context, sel ast.SelectionSet, ob
 		case "optimizedPoints":
 			out.Values[i] = ec._Track_optimizedPoints(ctx, field, obj)
 			if out.Values[i] == graphql.RequiredNull {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+	ec.ProcessDeferredGroup(graphql.DeferredGroup{
+		Defers:   deferLabelToView,
+		Path:     graphql.GetPath(ctx),
+		FieldSet: deferredFieldSet,
+		Context:  ctx,
+	})
+
+	return out
+}
+
+var trackImageImplementors = []string{"TrackImage"}
+
+func (ec *executionContext) _TrackImage(ctx context.Context, sel ast.SelectionSet, obj *model.TrackImage) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, trackImageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferredFieldSet := graphql.NewFieldSet(nil)
+	deferLabelToView := make(map[string]*graphql.FieldSetView)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TrackImage")
+		case "id":
+			out.Values[i] = ec._TrackImage_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "trackId":
+			out.Values[i] = ec._TrackImage_trackId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "filepath":
+			out.Values[i] = ec._TrackImage_filepath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		default:
@@ -3802,6 +4174,32 @@ func (ec *executionContext) marshalNTrack2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgra
 		return graphql.Null
 	}
 	return ec._Track(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTrackImage2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackImageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TrackImage) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNTrackImage2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackImage(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTrackImage2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackImage(ctx context.Context, sel ast.SelectionSet, v *model.TrackImage) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TrackImage(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTrackListResult2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐTrackListResult(ctx context.Context, sel ast.SelectionSet, v *model.TrackListResult) graphql.Marshaler {

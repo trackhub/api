@@ -17,6 +17,18 @@ type Point {
   lng: Float!
 }
 
+type ElevatioinPoint {
+  lat: Float!
+  lng: Float!
+  elevation: Float!
+}
+
+type TrackImage {
+  id: ID!
+  trackId: String!
+  filepath: String!
+}
+
 type Query {
   track(idOrSlug: String!, locale: Locale): Track!
 
@@ -30,6 +42,8 @@ type Query {
   ): TrackListResult!
 
   latestTracks(type: Int!, locale: Locale): [Track!]!
+
+  latestTrackImages: [TrackImage!]!
 
   listPlaces(
     skipPlaces: [String!]
