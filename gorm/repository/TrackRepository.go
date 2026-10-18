@@ -59,10 +59,10 @@ func (r *TrackRepository) FindAllPublicNotInId(ctx context.Context, ids []string
 
 	q := r.generateQuery(ctx).
 		Where("visibility = ?", gormModel.VisibilityPublic).
-		Where("point_north_east_lat <= ?", neLat).
-		Where("point_south_west_lat >= ?", swLat).
-		Where("point_north_east_lng <= ?", neLon).
-		Where("point_south_west_lng >= ?", swLon)
+		Where("point_north_east_lat >= ?", swLat).
+		Where("point_south_west_lat <= ?", neLat).
+		Where("point_north_east_lng >= ?", swLon).
+		Where("point_south_west_lng <= ?", neLon)
 
 	if len(ids) > 0 {
 		q = q.Where("id NOT IN ?", ids)
