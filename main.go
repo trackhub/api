@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -60,5 +61,7 @@ func main() {
 	g.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
 
-	r.Run(":" + os.Getenv("PORT"))
+	if err := r.Run(":" + os.Getenv("PORT")); err != nil {
+		log.Fatal("unable to start server: ", err)
+	}
 }

@@ -29,7 +29,7 @@ func (r *PlaceRepository) FindAllPublicNotInId(ctx context.Context, ids []string
 		q = q.Where("id NOT IN ?", ids)
 	}
 
-	tx := q.Find(&places)
+	tx := q.Limit(limit).Find(&places)
 
 	return places, tx.Error
 }

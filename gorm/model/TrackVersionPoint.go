@@ -1,13 +1,13 @@
 package model
 
-type TrackPoint struct {
+type TrackVersionPoint struct {
 	ID        string `gorm:"type:uuid;primaryKey"`
 	Order     int
 	Distance  float64
-	Version   string
+	VersionId string
 	Elevation float64
 }
 
-func (TrackPoint) TableName() string {
-	return "track_point"
+func (TrackVersionPoint) TableName() string {
+	return "point"
 }
