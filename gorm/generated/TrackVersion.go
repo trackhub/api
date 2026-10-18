@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"github.com/trackhub/api/gorm/model"
 	"gorm.io/cli/gorm/field"
 )
 
@@ -11,9 +12,11 @@ var TrackVersion = struct {
 	TrackId field.String
 	Name    field.String
 	FileId  field.String
+	Points  field.Slice[model.TrackVersionPoint]
 }{
 	ID:      field.String{}.WithColumn("id"),
 	TrackId: field.String{}.WithColumn("track_id"),
 	Name:    field.String{}.WithColumn("name"),
 	FileId:  field.String{}.WithColumn("file_id"),
+	Points:  field.Slice[model.TrackVersionPoint]{}.WithName("Points"),
 }

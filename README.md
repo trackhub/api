@@ -1,3 +1,6 @@
+# Playground
+- production: [api.track-hub.com](https://api.track-hub.com/)
+
 # Regenerating gqlgen
 ```
 go tool gqlgen

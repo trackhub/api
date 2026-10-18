@@ -20,10 +20,13 @@ func (r *TrackRepository) generateQuery(ctx context.Context) *gorm.DB {
 	return r.db.WithContext(ctx).
 		Model(&gormModel.Track{}).
 		Preload("TrackVersions").
+		Preload("TrackVersions.Points").
 		Preload("OptimizedPoints")
 }
 
 func (r *TrackRepository) GetBySlugOrId(ctx context.Context, id string) (*gormModel.Track, error) {
+	// @TODO search slug table for "old" slug, e.g. edited
+
 	var tracks []gormModel.Track
 
 	tx := r.generateQuery(ctx).

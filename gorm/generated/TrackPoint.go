@@ -10,12 +10,12 @@ var TrackPoint = struct {
 	ID        field.String
 	Order     field.Number[int]
 	Distance  field.Number[float64]
-	Version   field.String
+	VersionId field.String
 	Elevation field.Number[float64]
 }{
 	ID:        field.String{}.WithColumn("id"),
 	Order:     field.Number[int]{}.WithColumn("order"),
 	Distance:  field.Number[float64]{}.WithColumn("distance"),
-	Version:   field.String{}.WithColumn("version"),
+	VersionId: field.String{}.WithColumn("version_id"),
 	Elevation: field.Number[float64]{}.WithColumn("elevation"),
 }
