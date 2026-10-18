@@ -21,9 +21,12 @@ func (r *TrackRepository) generateQuery(ctx context.Context) *gorm.DB {
 		Model(&gormModel.Track{}).
 		Preload("TrackVersions").
 		Preload("TrackVersions.Points").
-		Preload("OptimizedPoints")
+		Preload("OptimizedPoints", func(db *gorm.DB) *gorm.DB {
+			return db.Order("`order` ASC")
+		})
 }
 
+// there is no filter by visibility. We won't support "private" visibility, only "unlisted"
 func (r *TrackRepository) GetBySlugOrId(ctx context.Context, id string) (*gormModel.Track, error) {
 	// @TODO search slug table for "old" slug, e.g. edited
 
@@ -65,7 +68,7 @@ func (r *TrackRepository) FindAllPublicNotInId(ctx context.Context, ids []string
 		q = q.Where("id NOT IN ?", ids)
 	}
 
-	tx := q.Find(&tracks)
+	tx := q.Limit(limit).Find(&tracks)
 
 	return tracks, tx.Error
 }
