@@ -5,6 +5,7 @@ type TrackVersion struct {
 	TrackId string `gorm:"type:uuid"`
 	Name    string
 	FileId  string
+	Points  []TrackVersionPoint `gorm:"foreignKey:VersionId"`
 }
 
 func (TrackVersion) TableName() string {
