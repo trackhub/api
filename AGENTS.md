@@ -11,6 +11,8 @@ If you modify schema files or database models, you must automatically regenerate
 | **GORM Models** | `gorm/model/` | `go tool gorm gen -i gorm/model/ -o gorm/generated` |
 | **GraphQL API** | `schema.graphqls` | `go tool gqlgen` |
 
+`/docker-compose-prod.yml` is intentionally not present.
+
 ## 3. Step-by-Step Task Execution Protocol
 Whenever the user asks you to add or modify a feature:
 1. Locate the correct core definition file (`schema.graphqls` or `gorm/model/`).

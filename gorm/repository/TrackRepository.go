@@ -30,28 +30,21 @@ func (r *TrackRepository) generateQuery(ctx context.Context) *gorm.DB {
 func (r *TrackRepository) GetBySlugOrId(ctx context.Context, id string) (*gormModel.Track, error) {
 	// @TODO search slug table for "old" slug, e.g. edited
 
-	var tracks []gormModel.Track
-
-	tx := r.generateQuery(ctx).
-		Where("id = ? or slug = ?", id, id).
-		Limit(2).
-		Find(&tracks)
-
-	if tx.Error != nil {
-		return nil, tx.Error
+	var track gormModel.Track
+	if err := r.generateQuery(ctx).Where("id = ?", id).First(&track).Error; err == nil {
+		return &track, nil
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
 	}
 
-	if len(tracks) == 1 {
-		return &tracks[0], nil
-	}
-
-	for _, track := range tracks {
-		if track.ID == id {
-			return &track, nil
+	if err := r.generateQuery(ctx).Where("slug = ?", id).First(&track).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("track " + id + " not found")
 		}
+		return nil, err
 	}
 
-	return nil, errors.New("track " + id + " not found")
+	return &track, nil
 }
 
 func (r *TrackRepository) FindAllPublicNotInId(ctx context.Context, ids []string, limit int, neLat, swLat, neLon, swLon float64) ([]gormModel.Track, error) {
@@ -59,10 +52,10 @@ func (r *TrackRepository) FindAllPublicNotInId(ctx context.Context, ids []string
 
 	q := r.generateQuery(ctx).
 		Where("visibility = ?", gormModel.VisibilityPublic).
-		Where("point_north_east_lat <= ?", neLat).
-		Where("point_south_west_lat >= ?", swLat).
-		Where("point_north_east_lng <= ?", neLon).
-		Where("point_south_west_lng >= ?", swLon)
+		Where("point_north_east_lat >= ?", swLat).
+		Where("point_south_west_lat <= ?", neLat).
+		Where("point_north_east_lng >= ?", swLon).
+		Where("point_south_west_lng <= ?", neLon)
 
 	if len(ids) > 0 {
 		q = q.Where("id NOT IN ?", ids)
