@@ -110,8 +110,19 @@ func (r *queryResolver) LatestTrackImages(ctx context.Context) ([]*model.TrackIm
 	return images, nil
 }
 
+// Place is the resolver for the place field.
+func (r *queryResolver) Place(ctx context.Context, idOrSlug string, locale *model.Locale) (*model.Place, error) {
+	place, err := r.PlaceRepository().GetBySlugOrId(ctx, idOrSlug)
+	if err != nil {
+		fmt.Println("error getting place", err)
+		return nil, errors.New("Unable to find the place")
+	}
+
+	return r.PlaceMapper().GormToGraph(place, locale), nil
+}
+
 // ListPlaces is the resolver for the listPlaces field.
-func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error) {
+func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) (*model.PlaceListResult, error) {
 	result := &model.PlaceListResult{}
 
 	const queryLimit = 100
@@ -141,21 +152,7 @@ func (r *queryResolver) ListPlaces(ctx context.Context, skipPlaces []string, neL
 			break
 		}
 
-		var icon *string
-		calculatedIcon, err := r.PlaceImageDetector().DetectImage(int(gormPlace.Type))
-		if err == nil {
-			icon = &calculatedIcon
-		}
-
-		place := &model.Place{
-			ID:         gormPlace.ID,
-			SlugOrID:   gormPlace.SlugOrId(),
-			Name:       &gormPlace.NameEn, // @TODO localize
-			Attraction: gormPlace.IsAttraction,
-			Icon:       icon,
-			Lat:        gormPlace.Lat,
-			Lng:        gormPlace.Lng,
-		}
+		place := r.PlaceMapper().GormToGraph(&gormPlace, locale)
 
 		places = append(
 			places,

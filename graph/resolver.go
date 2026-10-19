@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm/logger"
 
 	"github.com/trackhub/api/gorm/repository"
+	"github.com/trackhub/api/service/mapper"
 	placeService "github.com/trackhub/api/service/place"
 )
 
@@ -33,6 +34,12 @@ func (r Resolver) PlaceImageDetector() placeService.ImageDetector {
 
 func (r Resolver) TrackImageRepository() *repository.TrackImageRepository {
 	return repository.NewTrackImageRepository(r.DB)
+}
+
+func (r Resolver) PlaceMapper() *mapper.PlaceMapper {
+	return &mapper.PlaceMapper{
+		ImageDetector: r.PlaceImageDetector(),
+	}
 }
 
 func InitDB(user string, pass string, database string, host string) *gorm.DB {
