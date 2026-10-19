@@ -64,8 +64,9 @@ type ComplexityRoot struct {
 	Query struct {
 		LatestTrackImages func(childComplexity int) int
 		LatestTracks      func(childComplexity int, typeArg int, locale *model.Locale) int
-		ListPlaces        func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) int
+		ListPlaces        func(childComplexity int, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) int
 		ListTracks        func(childComplexity int, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) int
+		Place             func(childComplexity int, idOrSlug string, locale *model.Locale) int
 		Track             func(childComplexity int, idOrSlug string, locale *model.Locale) int
 	}
 
@@ -109,7 +110,8 @@ type QueryResolver interface {
 	ListTracks(ctx context.Context, skipTracks []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) (*model.TrackListResult, error)
 	LatestTracks(ctx context.Context, typeArg int, locale *model.Locale) ([]*model.Track, error)
 	LatestTrackImages(ctx context.Context) ([]*model.TrackImage, error)
-	ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64) (*model.PlaceListResult, error)
+	Place(ctx context.Context, idOrSlug string, locale *model.Locale) (*model.Place, error)
+	ListPlaces(ctx context.Context, skipPlaces []string, neLat float64, swLat float64, neLon float64, swLon float64, locale *model.Locale) (*model.PlaceListResult, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -245,7 +247,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Query.ListPlaces(childComplexity, args["skipPlaces"].([]string), args["neLat"].(float64), args["swLat"].(float64), args["neLon"].(float64), args["swLon"].(float64)), true
+		return e.ComplexityRoot.Query.ListPlaces(childComplexity, args["skipPlaces"].([]string), args["neLat"].(float64), args["swLat"].(float64), args["neLon"].(float64), args["swLon"].(float64), args["locale"].(*model.Locale)), true
 	case "Query.listTracks":
 		if e.ComplexityRoot.Query.ListTracks == nil {
 			break
@@ -257,6 +259,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.ListTracks(childComplexity, args["skipTracks"].([]string), args["neLat"].(float64), args["swLat"].(float64), args["neLon"].(float64), args["swLon"].(float64), args["locale"].(*model.Locale)), true
+	case "Query.place":
+		if e.ComplexityRoot.Query.Place == nil {
+			break
+		}
+
+		args, err := ec.field_Query_place_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.Place(childComplexity, args["idOrSlug"].(string), args["locale"].(*model.Locale)), true
 	case "Query.track":
 		if e.ComplexityRoot.Query.Track == nil {
 			break
@@ -478,12 +491,15 @@ type Query {
 
   latestTrackImages: [TrackImage!]!
 
+  place(idOrSlug: String!, locale: Locale): Place!
+
   listPlaces(
     skipPlaces: [String!]
     neLat: Float!
     swLat: Float!
     neLon: Float!
     swLon: Float!
+    locale: Locale
   ): PlaceListResult!
 }
 
@@ -813,6 +829,14 @@ func (ec *executionContext) field_Query_listPlaces_args(ctx context.Context, raw
 		return nil, err
 	}
 	args["swLon"] = arg4
+	arg5, err := graphql.ProcessArgField(ctx, rawArgs, "locale",
+		func(ctx context.Context, v any) (*model.Locale, error) {
+			return ec.unmarshalOLocale2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐLocale(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["locale"] = arg5
 	return args, nil
 }
 
@@ -867,6 +891,28 @@ func (ec *executionContext) field_Query_listTracks_args(ctx context.Context, raw
 		return nil, err
 	}
 	args["locale"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_place_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "idOrSlug",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["idOrSlug"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "locale",
+		func(ctx context.Context, v any) (*model.Locale, error) {
+			return ec.unmarshalOLocale2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐLocale(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["locale"] = arg1
 	return args, nil
 }
 
@@ -1447,6 +1493,50 @@ func (ec *executionContext) fieldContext_Query_latestTrackImages(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_place(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_place(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().Place(ctx, fc.Args["idOrSlug"].(string), fc.Args["locale"].(*model.Locale))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.Place) graphql.Marshaler {
+			return ec.marshalNPlace2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlace(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_place(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Place(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_place_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_listPlaces(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1457,7 +1547,7 @@ func (ec *executionContext) _Query_listPlaces(ctx context.Context, field graphql
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Query().ListPlaces(ctx, fc.Args["skipPlaces"].([]string), fc.Args["neLat"].(float64), fc.Args["swLat"].(float64), fc.Args["neLon"].(float64), fc.Args["swLon"].(float64))
+			return ec.Resolvers.Query().ListPlaces(ctx, fc.Args["skipPlaces"].([]string), fc.Args["neLat"].(float64), fc.Args["swLat"].(float64), fc.Args["neLon"].(float64), fc.Args["swLon"].(float64), fc.Args["locale"].(*model.Locale))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.PlaceListResult) graphql.Marshaler {
@@ -3313,6 +3403,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_latestTrackImages(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "place":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_place(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

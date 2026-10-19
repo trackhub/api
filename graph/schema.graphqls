@@ -45,12 +45,15 @@ type Query {
 
   latestTrackImages: [TrackImage!]!
 
+  place(idOrSlug: String!, locale: Locale): Place!
+
   listPlaces(
     skipPlaces: [String!]
     neLat: Float!
     swLat: Float!
     neLon: Float!
     swLon: Float!
+    locale: Locale
   ): PlaceListResult!
 }
 
