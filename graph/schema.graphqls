@@ -60,7 +60,9 @@ type Query {
 type Place {
   attraction: Boolean!
   id: String!
+  type: Int!
   slugOrId: String!
+  description: String
   slug: String
   name: String
   icon: String
