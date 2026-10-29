@@ -21,6 +21,7 @@ func (m *PlaceMapper) GormToGraph(p *gormModel.Place, locale *model.Locale) *gra
 	place := model.Place{
 		ID:         p.ID,
 		SlugOrID:   p.SlugOrId(),
+		Slug:       p.Slug,
 		Name:       &p.NameEn, // @TODO localize
 		Attraction: p.IsAttraction,
 		Icon:       icon,

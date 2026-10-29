@@ -48,6 +48,7 @@ type ComplexityRoot struct {
 		Lat        func(childComplexity int) int
 		Lng        func(childComplexity int) int
 		Name       func(childComplexity int) int
+		Slug       func(childComplexity int) int
 		SlugOrID   func(childComplexity int) int
 	}
 
@@ -187,6 +188,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Place.Name(childComplexity), true
+	case "Place.slug":
+		if e.ComplexityRoot.Place.Slug == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.Slug(childComplexity), true
 	case "Place.slugOrId":
 		if e.ComplexityRoot.Place.SlugOrID == nil {
 			break
@@ -507,6 +514,7 @@ type Place {
   attraction: Boolean!
   id: String!
   slugOrId: String!
+  slug: String
   name: String
   icon: String
   lat: Float!
@@ -552,6 +560,8 @@ func (ec *executionContext) childFields_Place(ctx context.Context, field graphql
 		return ec.fieldContext_Place_id(ctx, field)
 	case "slugOrId":
 		return ec.fieldContext_Place_slugOrId(ctx, field)
+	case "slug":
+		return ec.fieldContext_Place_slug(ctx, field)
 	case "name":
 		return ec.fieldContext_Place_name(ctx, field)
 	case "icon":
@@ -1133,6 +1143,29 @@ func (ec *executionContext) _Place_slugOrId(ctx context.Context, field graphql.C
 	)
 }
 func (ec *executionContext) fieldContext_Place_slugOrId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Place_slug(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_slug(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Slug, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Place_slug(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
@@ -3178,6 +3211,11 @@ func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, ob
 		case "slugOrId":
 			out.Values[i] = ec._Place_slugOrId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "slug":
+			out.Values[i] = ec._Place_slug(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
 				out.Invalids++
 			}
 		case "name":

@@ -61,6 +61,7 @@ type Place {
   attraction: Boolean!
   id: String!
   slugOrId: String!
+  slug: String
   name: String
   icon: String
   lat: Float!

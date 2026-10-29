@@ -19,6 +19,7 @@ type Place struct {
 	Attraction bool    `json:"attraction"`
 	ID         string  `json:"id"`
 	SlugOrID   string  `json:"slugOrId"`
+	Slug       *string `json:"slug,omitempty"`
 	Name       *string `json:"name,omitempty"`
 	Icon       *string `json:"icon,omitempty"`
 	Lat        float64 `json:"lat"`
