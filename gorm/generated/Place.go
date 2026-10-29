@@ -7,21 +7,23 @@ import (
 )
 
 var Place = struct {
-	ID           field.String
-	NameEn       field.String
-	NameBg       field.String
-	Slug         field.String
-	Lat          field.Number[float64]
-	Lng          field.Number[float64]
-	Type         field.Number[int16]
-	IsAttraction field.Bool
+	ID            field.String
+	NameEn        field.String
+	NameBg        field.String
+	DescriptionEn field.String
+	Slug          field.String
+	Lat           field.Number[float64]
+	Lng           field.Number[float64]
+	Type          field.Number[int16]
+	IsAttraction  field.Bool
 }{
-	ID:           field.String{}.WithColumn("id"),
-	NameEn:       field.String{}.WithColumn("name_en"),
-	NameBg:       field.String{}.WithColumn("name_bg"),
-	Slug:         field.String{}.WithColumn("slug"),
-	Lat:          field.Number[float64]{}.WithColumn("lat"),
-	Lng:          field.Number[float64]{}.WithColumn("lng"),
-	Type:         field.Number[int16]{}.WithColumn("type"),
-	IsAttraction: field.Bool{}.WithColumn("is_attraction"),
+	ID:            field.String{}.WithColumn("id"),
+	NameEn:        field.String{}.WithColumn("name_en"),
+	NameBg:        field.String{}.WithColumn("name_bg"),
+	DescriptionEn: field.String{}.WithColumn("description_en"),
+	Slug:          field.String{}.WithColumn("slug"),
+	Lat:           field.Number[float64]{}.WithColumn("lat"),
+	Lng:           field.Number[float64]{}.WithColumn("lng"),
+	Type:          field.Number[int16]{}.WithColumn("type"),
+	IsAttraction:  field.Bool{}.WithColumn("is_attraction"),
 }

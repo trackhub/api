@@ -5,14 +5,15 @@ const PLACE_TYPE_DRINKING_FOUNTAIN = 1
 const PLACE_TYPE_RESTAURANT = 2
 
 type Place struct {
-	ID           string `gorm:"type:uuid;primaryKey"`
-	NameEn       string
-	NameBg       string
-	Slug         *string
-	Lat          float64
-	Lng          float64
-	Type         int16
-	IsAttraction bool
+	ID            string `gorm:"type:uuid;primaryKey"`
+	NameEn        string
+	NameBg        string
+	DescriptionEn string
+	Slug          *string
+	Lat           float64
+	Lng           float64
+	Type          int16
+	IsAttraction  bool
 }
 
 func (Place) TableName() string {

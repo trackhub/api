@@ -16,13 +16,16 @@ type ElevatioinPoint struct {
 }
 
 type Place struct {
-	Attraction bool    `json:"attraction"`
-	ID         string  `json:"id"`
-	SlugOrID   string  `json:"slugOrId"`
-	Name       *string `json:"name,omitempty"`
-	Icon       *string `json:"icon,omitempty"`
-	Lat        float64 `json:"lat"`
-	Lng        float64 `json:"lng"`
+	Attraction  bool    `json:"attraction"`
+	ID          string  `json:"id"`
+	Type        int     `json:"type"`
+	SlugOrID    string  `json:"slugOrId"`
+	Description *string `json:"description,omitempty"`
+	Slug        *string `json:"slug,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	Icon        *string `json:"icon,omitempty"`
+	Lat         float64 `json:"lat"`
+	Lng         float64 `json:"lng"`
 }
 
 type PlaceListResult struct {
