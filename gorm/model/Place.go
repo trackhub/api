@@ -14,6 +14,7 @@ type Place struct {
 	Lng           float64
 	Type          int16
 	IsAttraction  bool
+	Images        []PlaceImage `gorm:"foreignKey:PlaceId"`
 }
 
 func (Place) TableName() string {

@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"github.com/trackhub/api/gorm/model"
 	"gorm.io/cli/gorm/field"
 )
 
@@ -16,6 +17,7 @@ var Place = struct {
 	Lng           field.Number[float64]
 	Type          field.Number[int16]
 	IsAttraction  field.Bool
+	Images        field.Slice[model.PlaceImage]
 }{
 	ID:            field.String{}.WithColumn("id"),
 	NameEn:        field.String{}.WithColumn("name_en"),
@@ -26,4 +28,5 @@ var Place = struct {
 	Lng:           field.Number[float64]{}.WithColumn("lng"),
 	Type:          field.Number[int16]{}.WithColumn("type"),
 	IsAttraction:  field.Bool{}.WithColumn("is_attraction"),
+	Images:        field.Slice[model.PlaceImage]{}.WithName("Images"),
 }

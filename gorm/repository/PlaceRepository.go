@@ -20,13 +20,13 @@ func (r *PlaceRepository) GetBySlugOrId(ctx context.Context, id string) (*gormMo
 	// @TODO search slug table for "old" slug, e.g. edited
 
 	var place gormModel.Place
-	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&place).Error; err == nil {
+	if err := r.db.WithContext(ctx).Preload("Images").Where("id = ?", id).First(&place).Error; err == nil {
 		return &place, nil
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
 
-	if err := r.db.WithContext(ctx).Where("slug = ?", id).First(&place).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Images").Where("slug = ?", id).First(&place).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("place " + id + " not found")
 		}
@@ -41,6 +41,7 @@ func (r *PlaceRepository) FindAllPublicNotInId(ctx context.Context, ids []string
 
 	q := r.db.WithContext(ctx).
 		Model(&gormModel.Place{}).
+		Preload("Images").
 		Where("lat <= ?", neLat).
 		Where("lat >= ?", swLat).
 		Where("lng <= ?", neLon).
