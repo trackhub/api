@@ -46,12 +46,19 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Icon        func(childComplexity int) int
+		Images      func(childComplexity int) int
 		Lat         func(childComplexity int) int
 		Lng         func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Slug        func(childComplexity int) int
 		SlugOrID    func(childComplexity int) int
 		Type        func(childComplexity int) int
+	}
+
+	PlaceImage struct {
+		Filepath func(childComplexity int) int
+		ID       func(childComplexity int) int
+		PlaceID  func(childComplexity int) int
 	}
 
 	PlaceListResult struct {
@@ -178,6 +185,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Place.Icon(childComplexity), true
+	case "Place.images":
+		if e.ComplexityRoot.Place.Images == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Place.Images(childComplexity), true
 	case "Place.lat":
 		if e.ComplexityRoot.Place.Lat == nil {
 			break
@@ -214,6 +227,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Place.Type(childComplexity), true
+
+	case "PlaceImage.filepath":
+		if e.ComplexityRoot.PlaceImage.Filepath == nil {
+			break
+		}
+
+		return e.ComplexityRoot.PlaceImage.Filepath(childComplexity), true
+	case "PlaceImage.id":
+		if e.ComplexityRoot.PlaceImage.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.PlaceImage.ID(childComplexity), true
+	case "PlaceImage.placeId":
+		if e.ComplexityRoot.PlaceImage.PlaceID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.PlaceImage.PlaceID(childComplexity), true
 
 	case "PlaceListResult.places":
 		if e.ComplexityRoot.PlaceListResult.Places == nil {
@@ -496,6 +528,12 @@ type TrackImage {
   filepath: String!
 }
 
+type PlaceImage {
+  id: String!
+  placeId: String!
+  filepath: String!
+}
+
 type Query {
   track(idOrSlug: String!, locale: Locale): Track!
 
@@ -535,6 +573,7 @@ type Place {
   icon: String
   lat: Float!
   lng: Float!
+  images: [PlaceImage!]!
 }
 
 type Track {
@@ -590,8 +629,22 @@ func (ec *executionContext) childFields_Place(ctx context.Context, field graphql
 		return ec.fieldContext_Place_lat(ctx, field)
 	case "lng":
 		return ec.fieldContext_Place_lng(ctx, field)
+	case "images":
+		return ec.fieldContext_Place_images(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Place", field.Name)
+}
+
+func (ec *executionContext) childFields_PlaceImage(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "id":
+		return ec.fieldContext_PlaceImage_id(ctx, field)
+	case "placeId":
+		return ec.fieldContext_PlaceImage_placeId(ctx, field)
+	case "filepath":
+		return ec.fieldContext_PlaceImage_filepath(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type PlaceImage", field.Name)
 }
 
 func (ec *executionContext) childFields_PlaceListResult(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
@@ -1325,6 +1378,107 @@ func (ec *executionContext) _Place_lng(ctx context.Context, field graphql.Collec
 }
 func (ec *executionContext) fieldContext_Place_lng(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Place", field, false, false, errors.New("field of type Float does not have child fields"))
+}
+
+func (ec *executionContext) _Place_images(ctx context.Context, field graphql.CollectedField, obj *model.Place) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Place_images(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Images, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.PlaceImage) graphql.Marshaler {
+			return ec.marshalNPlaceImage2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlaceImageᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Place_images(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Place",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_PlaceImage(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PlaceImage_id(ctx context.Context, field graphql.CollectedField, obj *model.PlaceImage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_PlaceImage_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_PlaceImage_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("PlaceImage", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _PlaceImage_placeId(ctx context.Context, field graphql.CollectedField, obj *model.PlaceImage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_PlaceImage_placeId(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.PlaceID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_PlaceImage_placeId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("PlaceImage", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _PlaceImage_filepath(ctx context.Context, field graphql.CollectedField, obj *model.PlaceImage) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_PlaceImage_filepath(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Filepath, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_PlaceImage_filepath(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("PlaceImage", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
 func (ec *executionContext) _PlaceListResult_places(ctx context.Context, field graphql.CollectedField, obj *model.PlaceListResult) (ret graphql.Marshaler) {
@@ -3314,6 +3468,59 @@ func (ec *executionContext) _Place(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "images":
+			out.Values[i] = ec._Place_images(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferLabelToView), math.MaxInt32)))
+
+	ec.ProcessDeferredGroup(graphql.DeferredGroup{
+		Defers:   deferLabelToView,
+		Path:     graphql.GetPath(ctx),
+		FieldSet: deferredFieldSet,
+		Context:  ctx,
+	})
+
+	return out
+}
+
+var placeImageImplementors = []string{"PlaceImage"}
+
+func (ec *executionContext) _PlaceImage(ctx context.Context, sel ast.SelectionSet, obj *model.PlaceImage) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, placeImageImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferredFieldSet := graphql.NewFieldSet(nil)
+	deferLabelToView := make(map[string]*graphql.FieldSetView)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PlaceImage")
+		case "id":
+			out.Values[i] = ec._PlaceImage_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "placeId":
+			out.Values[i] = ec._PlaceImage_placeId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "filepath":
+			out.Values[i] = ec._PlaceImage_filepath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4328,6 +4535,32 @@ func (ec *executionContext) marshalNPlace2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgra
 		return graphql.Null
 	}
 	return ec._Place(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPlaceImage2ᚕᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlaceImageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PlaceImage) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNPlaceImage2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlaceImage(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNPlaceImage2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlaceImage(ctx context.Context, sel ast.SelectionSet, v *model.PlaceImage) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PlaceImage(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPlaceListResult2ᚖgithubᚗcomᚋtrackhubᚋapiᚋgraphᚋmodelᚐPlaceListResult(ctx context.Context, sel ast.SelectionSet, v *model.PlaceListResult) graphql.Marshaler {

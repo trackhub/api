@@ -29,6 +29,12 @@ type TrackImage {
   filepath: String!
 }
 
+type PlaceImage {
+  id: String!
+  placeId: String!
+  filepath: String!
+}
+
 type Query {
   track(idOrSlug: String!, locale: Locale): Track!
 
@@ -68,6 +74,7 @@ type Place {
   icon: String
   lat: Float!
   lng: Float!
+  images: [PlaceImage!]!
 }
 
 type Track {

@@ -28,6 +28,14 @@ func (m *PlaceMapper) GormToGraph(p *gormModel.Place, locale *model.Locale) *gra
 		Icon:        icon,
 		Lat:         p.Lat,
 		Lng:         p.Lng,
+		Images:      make([]*model.PlaceImage, 0, len(p.Images)),
+	}
+	for _, image := range p.Images {
+		place.Images = append(place.Images, &model.PlaceImage{
+			ID:       image.ID,
+			PlaceID:  image.PlaceId,
+			Filepath: image.Filepath,
+		})
 	}
 
 	return &place
